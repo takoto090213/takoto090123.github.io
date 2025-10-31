@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>脱毛料金シミュレーター｜キャンペーン専用</title>
+  <style>
+    :root{--brand:#0077c8;--brand2:#00b3a4;--ink:#333;--box:#e6eef7;--accent:#f2f9ff;--border:#d8e2ee}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:#f7f9fc;color:var(--ink);font-family:'Hiragino Sans',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    header{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;padding:22px 12px;text-align:center}
+    header h1{margin:0;font-size:22px}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .hint{margin:8px 0 14px;color:#3a556f}
+
+    /* 共通UI */
+    h2{border-left:6px solid var(--brand2);padding-left:10px;color:var(--brand);margin:2px 0 12px}
+    label{display:block;margin-top:10px;font-weight:700}
+    input,select,button{font-size:14px}
+    input,select{width:100%;padding:9px;border:1px solid #cfd9e6;border-radius:8px;margin-top:6px;background:#fff;position:relative;z-index:5}
+    select{appearance:auto}
+    .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:8px}
+    .result{margin-top:12px}
+    .cards{display:grid;gap:12px}
+    .cards.two-col{grid-template-columns:1fr 1fr}
+    @media(max-width:640px){.cards.two-col{grid-template-columns:1fr}}
+    .card{background:var(--accent);border:1px solid var(--border);border-radius:12px;padding:12px}
+    .card h3{margin:0 0 6px;font-size:12px;color:#2b4058;font-weight:800;letter-spacing:.2px}
+    .card p{margin:0;font-size:18px;font-weight:700;color:#0e3352;white-space:pre-line}
+    .card.highlight{background:#fff;border:2px solid var(--brand);box-shadow:0 0 0 3px rgba(0,119,200,.06)}
+    .card.highlight p{font-size:22px}
+    table{width:100%;border-collapse:separate;border-spacing:0 6px}
+    th,td{background:#fff;border:1px solid #dfe8f3;padding:8px}
+    .cta{display:flex;justify-content:center;margin:14px 0}
+    .cta button{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border:none;border-radius:24px;padding:10px 26px;cursor:pointer}
+    .error{color:#b00020;font-size:13px}
+
+    /* 追加: 編集ターゲットと松竹梅比較 */
+    .pillset{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{border:1px solid #cfd9e6;padding:8px 12px;border-radius:999px;background:#fff;cursor:pointer;user-select:none}
+    .pill.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,119,200,.08)}
+
+    /* 縦並びの松竹梅（順番固定 / スワイプで“中身”を入替） */
+    .tiers{display:grid;gap:12px;margin-top:6px}
+    .plan-card{border:1px solid #dfe8f3;border-radius:12px;padding:12px;background:#fff;min-height:172px;user-select:none;touch-action:pan-y}
+    .plan-card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,119,200,.06)}
+    .plan-card .title{font-weight:900;color:#143a55;margin-bottom:8px}
+    .plan-card .price{font-size:18px;font-weight:900;color:#0b62a4;background:#e7f2ff;border:1px solid #cfe6ff;border-radius:8px;padding:6px 8px;display:inline-block}
+    .plan-card .planlist{font-size:20px;line-height:1.7;font-weight:900;color:#0b2f4a;margin-top:6px;white-space:pre-line;letter-spacing:.2px}
+    .plan-card .monthly{margin-top:6px;font-size:16px;font-weight:900;color:#0a6b58;background:#e9f8f5;border:1px solid #c9eee7;border-radius:8px;padding:4px 8px;display:inline-block}
+
+    /* 視覚的ランク差（縦：松→竹→梅） */
+    .plan-card[data-tier="matsu"]{background:linear-gradient(180deg, #fff, #f2f8ff)}
+    .plan-card[data-tier="take"]{background:linear-gradient(180deg, #fff, #f7fbff)}
+    .plan-card[data-tier="ume"]{background:linear-gradient(180deg, #fff, #fbfdff)}
+
+    /* スワイプのガイド */
+    .swipe-hint{font-size:12px;color:#557;opacity:.8;margin-top:6px}
+    .swipe-shadow{transition:box-shadow .12s ease;}
+    .swipe-shadow.swiping{box-shadow:0 6px 14px rgba(0,0,0,.15)}
+
+    .right{justify-self:end}
+    .btn-wrap{display:flex;align-items:end}
+    .btn-wrap button{display:inline-block}
+
+    /* 結果カード群の上下に余白 */
+    .result .cards + .cards { margin-top: 18px; }
+    .cards.two-col { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>脱毛料金シミュレーター｜キャンペーン専用</h1>
+  </header>
+  <div class="wrap">
+    <div class="hint">キャンペーンのみを表示しています。<b>編集ターゲット</b>（松/竹/梅）を先に選び、カテゴリ・プランを追加してください。松竹梅カードには<b>プラン名（[カテゴリ] 付き）</b>と<b>月々金額</b>が連動表示されます。<br>各カードは<strong>上下スワイプ</strong>で<b>順序を入替</b>できます（見た目の順序は固定／中身を交換）。</div>
+
+    <!-- ① 編集ターゲット（カテゴリ/プランの上） -->
+    <div class='row' id='edit-target-row'>
+      <label>編集ターゲット：</label>
+      <div class='pillset' role='tablist' aria-label='編集ターゲット'>
+        <div class='pill active' data-target='matsu' role='tab' aria-selected='true'>松（上位）</div>
+        <div class='pill' data-target='take' role='tab' aria-selected='false'>竹（中位）</div>
+        <div class='pill' data-target='ume' role='tab' aria-selected='false'>梅（基本）</div>
+      </div>
+    </div>
+
+    <!-- 1) カテゴリ/プラン/金額 -->
+    <div class='row'>
+      <label>カテゴリ<select id='cat-select-c'>
+        <option value='ヒゲ'>ヒゲ（眉小鼻無し）</option>
+        <option value='フェイス'>フェイス</option>
+        <option value='どこでも脱毛'>どこでも脱毛</option>
+        <option value='全身'>全身</option>
+        <option value='全身オール'>全身オール</option>
+        <option value='陰部'>陰部</option>
+        <option value='眉小鼻'>眉小鼻</option>
+      </select></label>
+      <label>プラン<select id='plan-select-c'></select></label>
+    </div>
+    <div class='row'>
+      <label>選択プラン金額（税込）<input id='selected-plan-price-c' readonly value='0'></label>
+      <div class='btn-wrap'><button id='add-plan-c' type='button'>＋追加</button></div>
+    </div>
+
+    <!-- ② 松・竹・梅（縦） -->
+    <div class='tiers' id='compare-cards' aria-label='松・竹・梅プラン比較（キャンペーン組み合わせ)'>
+      <div class='plan-card active swipe-shadow' data-tier='matsu'>
+        <div class='title'>松（上位）</div>
+        <div class='price' id='price-matsu'>¥0</div>
+        <div class='monthly' id='monthly-tier-matsu'>月々 ¥0</div>
+        <div class='planlist' id='planlist-matsu'>（プラン未選択）</div>
+        <div class='swipe-hint'>↑↓スワイプで竹/梅と入替</div>
+      </div>
+      <div class='plan-card swipe-shadow' data-tier='take'>
+        <div class='title'>竹（中位）</div>
+        <div class='price' id='price-take'>¥0</div>
+        <div class='monthly' id='monthly-tier-take'>月々 ¥0</div>
+        <div class='planlist' id='planlist-take'>（プラン未選択）</div>
+        <div class='swipe-hint'>↑↓スワイプで松/梅と入替</div>
+      </div>
+      <div class='plan-card swipe-shadow' data-tier='ume'>
+        <div class='title'>梅（基本）</div>
+        <div class='price' id='price-ume'>¥0</div>
+        <div class='monthly' id='monthly-tier-ume'>月々 ¥0</div>
+        <div class='planlist' id='planlist-ume'>（プラン未選択）</div>
+        <div class='swipe-hint'>↑↓スワイプで松/竹と入替</div>
+      </div>
+    </div>
+
+    <!-- 3) 組み合わせテーブル（ティアごとに1テーブルを描画） → 合計 -->
+    <div class='row'>
+      <table>
+        <thead><tr><th>カテゴリ</th><th>プラン（回数名）</th><th>金額</th><th>操作</th></tr></thead>
+        <tbody id='combo-body-c'></tbody>
+      </table>
+    </div>
+    <div class='row'>
+      <label>組み合わせ合計（税込・自動反映）<input id='combo-total-c' readonly value='0'></label>
+    </div>
+
+    <!-- 4) 分割シミュレーション（キャンペーン） -->
+    <h2>分割シミュレーション（キャンペーン）</h2>
+    <div class='row'>
+      <label>プラン総額（税込）<input type='number' id='total-campaign' value='158000' readonly></label>
+      <label>頭金（1000円以上・千円単位）<input type='number' id='downPayment-campaign' value='100000' min='1000' step='1000'></label>
+    </div>
+    <div class='row'>
+      <label>支払い回数（1,2,6〜50回）<select id='months-campaign'></select></label>
+      <label>ボーナス利用<select id='bonus-toggle-campaign'><option value='off'>なし</option><option value='on' selected>あり</option></select></label>
+    </div>
+    <div class='row' id='bonus-row-campaign'>
+      <label>ボーナス加算金（千円単位/月）<input type='number' id='bonus-campaign' value='0' min='0' step='1000'></label>
+      <label>ボーナス支払月（夏）<select id='bonus-summer-campaign'><option value=''>選択なし</option><option value='6'>6月</option><option value='7'>7月</option><option value='8'>8月</option></select></label>
+      <label>ボーナス支払月（冬）<select id='bonus-winter-campaign'><option value=''>選択なし</option><option value='12'>12月</option><option value='1'>1月</option></select></label>
+    </div>
+    <div class='result'>
+      <div class='cards two-col'>
+        <div class='card'><h3>初回のお支払い</h3><p id='first-campaign'>¥0</p></div>
+        <div class='card highlight'><h3>2回目以降のお支払い</h3><p id='monthly-campaign'>¥0</p></div>
+        <div class='card'><h3>クレジット残高</h3><p id='principal-campaign'>¥0</p></div>
+        <div class='card'><h3>分割手数料</h3><p id='fee-campaign'>¥0</p></div>
+        <div class='card'><h3>分割支払い金合計</h3><p id='sum-campaign'>¥0</p></div>
+        <div class='card'><h3>支払総額（頭金含む）</h3><p id='grand-campaign'>¥0</p></div>
+      </div>
+      <div class='cards' style='margin-top:18px'>
+        <div class='card'><h3>初回お支払い年月（2か月後）</h3><p id='first-date-campaign'>-</p></div>
+        <div class='card'><h3>最終お支払い年月</h3><p id='last-date-campaign'>-</p></div>
+        <div class='card'><h3>ボーナス情報</h3><p id='bonus-info-campaign'>-</p></div>
+        <div class='card'><h3>バリデーション</h3><p id='alerts-campaign'>-</p></div>
+      </div>
+    </div>
+
+    <!-- 5) プラン定義（管理者向け） -->
+    <details>
+      <summary>⚙ キャンペーンのプラン定義を編集（管理者向け）</summary>
+      <p>プラン名の誤り・不足があれば、このJSONを編集→保存してください（即時プルダウンへ反映）。</p>
+      <textarea id="campaign-json" style="width:100%;height:220px;font-family:ui-monospace,Consolas,monospace"></textarea>
+      <div class='cta'><button type='button' id='save-campaign-json'>定義を保存</button></div>
+      <div class='error' id='campaign-json-error' aria-live='polite'></div>
+    </details>
+
+    <div id="err" class="error" aria-live="polite"></div>
+  </div>
+
+  <script>
+  // ランタイムエラーを画面下に表示 & 壊れたローカル定義で初期化が止まるのを回避
+  (function(){
+    window.addEventListener('error', function(e){ var box = document.getElementById('err'); if(box){ box.textContent = 'エラー: ' + e.message; }});
+    try{ var raw = localStorage.getItem('CAMPAIGN_DEF'); if(raw){ JSON.parse(raw); } }catch(_){ localStorage.removeItem('CAMPAIGN_DEF'); }
+  })();
+  </script>
+
+  <script>
+  /* === プルダウン安全初期化 & デフォルト定義（キャンペーン専用） === */
+  (function(){
+    function toJPY(n){return '¥'+Math.max(0,Math.floor(n||0)).toLocaleString();}
+    var DEFAULT_CAMPAIGN={
+      'ヒゲ':{
+        'スタートプラン8回':110660,
+        'ライトプラン12回（アフター保障30％）':143770,
+        'スタンダード12回+1年（アフター保障50％）':277750,
+        'プレミアム12回+1年（アフター保障80％）':333310
+      },
+      'フェイス':{
+        'スタートプラン8回':158430,
+        'ライトプラン12回（アフター保障30％）':197000,
+        'スタンダード12回+1年（アフター保障50％）':326890,
+        'プレミアム12回+1年（アフター保障80％）':374260
+      },
+      'どこでも脱毛':{
+        'どこでも40分6回':237300,
+        'どこでも40分9回（アフター保障50％）':345600,
+        'どこでも60分6回（アフター保障25％）':294800,
+        'どこでも60分9回（アフター保障50％）':429000
+      },
+      '全身':{
+        'トライアルプラン4回':196800,
+        'スタートプラン8回（アフター保障25％）':359750,
+        'ライトプラン12回（アフター保障50％）':506480,
+        'スタンダード12回+1年（アフター保障80％）':795160,
+        'プレミアム12回+1年（アフター保障90％）':906270
+      },
+      '全身オール':{
+        'トライアルプラン4回':213400,
+        'スタートプラン8回（アフター保障25％）':396640,
+        'ライトプラン12回（アフター保障50％）':554420,
+        'スタンダード12回+1年（アフター保障80％）':887750,
+        'プレミアム12回+1年（アフター保障90％）':1054420
+      },
+      '陰部':{
+        '1ヶ所4回':44420,
+        '2ヶ所4回':66640,
+        '3ヶ所4回':83310,
+        '4ヶ所4回':95530,
+        '1ヶ所8回（アフター保障25％）':88860,
+        '2ヶ所8回（アフター保障25％）':133310,
+        '3ヶ所8回（アフター保障25％）':166640,
+        '4ヶ所8回（アフター保障25％）':194420,
+        '1ヶ所12回（アフター保障50％）':122200,
+        '2ヶ所12回（アフター保障50％）':183310,
+        '3ヶ所12回（アフター保障50％）':233310,
+        '4ヶ所12回（アフター保障50％）':299970,
+        '1ヶ所12回+1年（アフター保障80％）':172200,
+        '2ヶ所12回+1年（アフター保障80％）':233310,
+        '3ヶ所12回+1年（アフター保障80％）':322200,
+        '4ヶ所12回+1年（アフター保障80％）':388860
+      },
+      '眉小鼻':{
+        'スタートプラン8回（アフター保障30％）':68250,
+        'ライトプラン12回（アフター保障50％）':81900,
+        'スタンダード12回+1年（アフター保障80％）':181800
+      }
+    };
+    try{ window.__DEFAULT_CAMPAIGN = DEFAULT_CAMPAIGN; }catch(_){ }
+    function getCAMPAIGN(){
+      try{ var raw = localStorage.getItem('CAMPAIGN_DEF'); if(raw){ var obj = JSON.parse(raw); if(obj && typeof obj==='object') return obj; } }catch(e){}
+      return DEFAULT_CAMPAIGN;
+    }
+    function setCAMPAIGN(obj){ try{ localStorage.setItem('CAMPAIGN_DEF', JSON.stringify(obj)); }catch(_){} }
+
+    function ensureMonths(id){
+      var el=document.getElementById(id); if(!el) return;
+      if(el.options.length<=2){
+        var base=[1,2]; for(var m=6;m<=50;m++) base.push(m);
+        el.innerHTML='';
+        base.forEach(function(v){ var o=document.createElement('option'); o.value=String(v); o.textContent=v+'回'; el.appendChild(o); });
+        el.value='48';
+      }
+    }
+
+    function reloadCampaignPlansSafe(){
+      var cCat=document.getElementById('cat-select-c');
+      var cPlan=document.getElementById('plan-select-c');
+      var cPrice=document.getElementById('selected-plan-price-c');
+      if(!cCat||!cPlan) return;
+      var CAMPAIGN=getCAMPAIGN();
+      var dict=CAMPAIGN[cCat.value]||{}; var keys=Object.keys(dict);
+      if(keys.length===0){ CAMPAIGN=DEFAULT_CAMPAIGN; setCAMPAIGN(CAMPAIGN); dict=CAMPAIGN[cCat.value]||{}; keys=Object.keys(dict); }
+      cPlan.innerHTML='';
+      keys.forEach(function(k){ var op=document.createElement('option'); op.value=k; op.textContent=k; cPlan.appendChild(op); });
+      if(cPrice) cPrice.value = (dict[cPlan.value]||0).toLocaleString();
+      cPlan.disabled=false; cCat.disabled=false;
+      cPlan.style.zIndex=1002; cPlan.style.pointerEvents='auto';
+      cCat.style.zIndex=1002; cCat.style.pointerEvents='auto';
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      ensureMonths('months-campaign');
+      reloadCampaignPlansSafe();
+
+      var cCat=document.getElementById('cat-select-c');
+      var cPlan=document.getElementById('plan-select-c');
+      var cPrice=document.getElementById('selected-plan-price-c');
+      if(cCat){ cCat.addEventListener('change', reloadCampaignPlansSafe); }
+      if(cPlan){ cPlan.addEventListener('change', function(){ var dict=(getCAMPAIGN()[cCat.value]||{}); if(cPrice) cPrice.value=(dict[cPlan.value]||0).toLocaleString(); }); }
+
+      // JSON エディタ（定義の保存）
+      var cfgBox = document.getElementById('campaign-json');
+      var cfgBtn = document.getElementById('save-campaign-json');
+      var cfgErr = document.getElementById('campaign-json-error');
+      if(cfgBox && cfgBtn){
+        try{ cfgBox.value = JSON.stringify(getCAMPAIGN(), null, 2); }catch(e){}
+        cfgBtn.addEventListener('click', function(){
+          if(cfgErr) cfgErr.textContent='';
+          try{ var obj = JSON.parse(cfgBox.value); if(!obj || typeof obj!== 'object') throw new Error('JSONが不正です'); setCAMPAIGN(obj); reloadCampaignPlansSafe(); }
+          catch(e){ if(cfgErr) cfgErr.textContent = '保存エラー: '+ e.message; }
+        });
+      }
+
+      // --- ミニテスト ---
+      (function miniTests(){
+        var mustIds=['cat-select-c','plan-select-c','months-campaign'];
+        var missing = mustIds.filter(function(id){ return !document.getElementById(id); });
+        if(missing.length){ var box=document.getElementById('err'); if(box) box.textContent = '[test] DOM NG: '+ missing.join(', '); }
+      })();
+    });
+  })();
+  </script>
+
+  <script>
+  // === キャンペーン：追加ボタン & 値修正 & 松竹梅（順番固定 / スワイプ入替） ===
+  (function(){
+    'use strict';
+    function toJPY(n){ return '¥'+Math.max(0,Math.floor(n||0)).toLocaleString(); }
+    function getCampaign(){ try{ var raw=localStorage.getItem('CAMPAIGN_DEF'); if(raw){ var obj=JSON.parse(raw); if(obj && typeof obj==='object') return obj; } }catch(e){} return (window.__DEFAULT_CAMPAIGN)||{}; }
+    function getEl(id){ return document.getElementById(id); }
+    function numById(id){ var el=getEl(id); return el? Number(el.value||0) : 0; }
+
+    var catSel = getEl('cat-select-c');
+    var planSel = getEl('plan-select-c');
+    var addBtn = getEl('add-plan-c');
+    var tableBody = getEl('combo-body-c');
+    var comboTotal = getEl('combo-total-c');
+    var compare = getEl('compare-cards');
+    if(!catSel || !planSel || !addBtn || !tableBody || !comboTotal || !compare){ var errBox=getEl('err'); if(errBox) errBox.textContent='[hotfix] 必要なDOMが不足しています。'; return; }
+
+    // ティア（松竹梅）カート（順番固定）
+    var tierCarts = { matsu:[], take:[], ume:[] }; // item: {cat,name,amount,orig,disc}
+    var currentTier = 'matsu';
+
+    // 共有API（スワイプからも利用）
+    window.__getTierCarts = function(){ return tierCarts; };
+    window.__swapTierCarts = function(a,b){ var tmp=tierCarts[a]; tierCarts[a]=tierCarts[b]; tierCarts[b]=tmp; renderTierTable(); syncTotalsAndCards(); };
+
+    function sumTier(t){ return (tierCarts[t]||[]).reduce(function(a,b){ return a + (Number(b.amount)||0); }, 0); }
+    function planText(t){
+      var list = (tierCarts[t]||[]).map(function(x){
+        var head = '['+x.cat+'] '+ x.name;
+        var orig = Number(x.orig||x.amount)||0; var after = Number(x.amount)||0; var disc = Math.max(0, orig - after);
+        return disc>0 ? (head + ' ' + toJPY(orig) + ' → -' + toJPY(disc) + ' = ' + toJPY(after)) : (head + ' ' + toJPY(after));
+      });
+      return list.length ? list.join('\n') : '（プラン未選択）';
+    }
+
+    function markActiveTier(){
+      document.querySelectorAll('.pill').forEach(function(p){ var on=p.getAttribute('data-target')===currentTier; p.classList.toggle('active',on); p.setAttribute('aria-selected', on?'true':'false'); });
+      document.querySelectorAll('.plan-card').forEach(function(c){ c.classList.toggle('active', c.getAttribute('data-tier')===currentTier); });
+    }
+    function setTier(t){ if(!tierCarts[t]) return; currentTier=t; renderTierTable(); syncTotalsAndCards(); markActiveTier(); }
+    document.querySelectorAll('.pill').forEach(function(p){ p.addEventListener('click', function(){ setTier(p.getAttribute('data-target')); }); });
+    document.querySelectorAll('.plan-card').forEach(function(c){ c.addEventListener('click', function(){ setTier(c.getAttribute('data-tier')); }); });
+
+    function renderTierTable(){
+      tableBody.innerHTML='';
+      (tierCarts[currentTier]||[]).forEach(function(item, idx){
+        var tr=document.createElement('tr'); tr.setAttribute('data-idx', String(idx));
+        tr.innerHTML = '<td>'+item.cat+'</td>' +
+                       '<td>'+item.name+'</td>' +
+                       '<td data-amt="'+item.amount+'">'+toJPY(item.amount)+'</td>' +
+                       '<td><div class="ops">\
+                         <button type="button" class="btn-discount">値修正<\/button>\
+                         <button type="button" class="btn-del">削除<\/button>\
+                         <div class="discount-editor" hidden>\
+                           <input type="number" class="disc-input" min="0" max="100" step="1" placeholder="割引率%">\
+                           <button type="button" class="apply-disc">適用<\/button>\
+                           <button type="button" class="cancel-disc">キャンセル<\/button>\
+                         <\/div>\
+                       <\/div><\/td>';
+        tableBody.appendChild(tr);
+      });
+      comboTotal.value = sumTier(currentTier).toLocaleString();
+    }
+
+    tableBody.addEventListener('click', function(ev){
+      var target = ev.target; var tr = target.closest('tr'); if(!tr) return;
+      var idx = parseInt(tr.getAttribute('data-idx')||'-1',10); if(!(idx>=0)) return;
+      var item = tierCarts[currentTier][idx]; if(!item) return;
+
+      if(target.classList.contains('btn-del')){
+        tierCarts[currentTier].splice(idx,1); renderTierTable(); syncTotalsAndCards(); return;
+      }
+      if(target.classList.contains('btn-discount')){
+        var ed = tr.querySelector('.discount-editor'); var inpt = tr.querySelector('.disc-input');
+        if(ed){
+          var orig = Number(item.orig || item.amount) || 0; var rate = 0;
+          if(orig>0 && item.amount>=0 && item.amount<=orig){ rate = Math.floor((1 - (item.amount/orig)) * 100); }
+          if(inpt){ inpt.value = String(rate); }
+          ed.hidden = !ed.hidden;
+        }
+        return;
+      }
+      if(target.classList.contains('apply-disc')){
+        var inpt = tr.querySelector('.disc-input'); var val = Math.max(0, Math.min(100, Math.floor(Number(inpt && inpt.value || 0))));
+        var orig = Number(item.orig || item.amount) || 0; var after = Math.floor(orig * (100 - val) / 100);
+        item.amount = after; item.disc = Math.max(0, orig - after);
+        renderTierTable(); syncTotalsAndCards(); return;
+      }
+      if(target.classList.contains('cancel-disc')){ var ed = tr.querySelector('.discount-editor'); if(ed){ ed.hidden = true; } return; }
+    });
+
+    // 月々（カード用）も Nexus 算法に合わせる
+    function calcMonthlyFor(total){
+      var down = Math.max(1000, numById('downPayment-campaign'));
+      var months = numById('months-campaign');
+      var bonus = Math.max(0, numById('bonus-campaign'));
+      var principal = Math.max(0, total - down);
+      var rate = 0.008;
+      var fee = Math.floor(principal * rate * months); // 円切捨て
+      var sum = principal + fee;
+      var summerSel = (getEl('bonus-summer-campaign')||{}).value||'';
+      var winterSel = (getEl('bonus-winter-campaign')||{}).value||'';
+      var summer = ['6','7','8'].indexOf(String(summerSel))>=0 ? 1 : 0;
+      var winter = ['12','1'].indexOf(String(winterSel))>=0 ? 1 : 0;
+      var years = Math.ceil(Math.max(1,months)/12);
+      var bonusCount = bonus>0 ? (summer+winter)*years : 0;
+      var bonusTotal = bonus * bonusCount;
+      var monthly = Math.max(0, Math.floor(((sum - bonusTotal)/Math.max(1,months))/100)*100);
+      return monthly;
+    }
+
+    function syncCompareCards(){
+      ['matsu','take','ume'].forEach(function(tier){
+        var priceEl = getEl('price-'+tier); var listEl = getEl('planlist-'+tier); var mEl = getEl('monthly-tier-'+tier);
+        if(priceEl) priceEl.textContent = toJPY(sumTier(tier));
+        if(listEl) listEl.textContent = planText(tier);
+        if(mEl) mEl.textContent = '月々 ' + toJPY(calcMonthlyFor(sumTier(tier)));
+      });
+    }
+
+    function syncTotalsAndCards(){
+      var total = sumTier(currentTier);
+      var totalInput = getEl('total-campaign'); if(totalInput) totalInput.value = total;
+      comboTotal.value = total.toLocaleString();
+      syncCompareCards();
+      if(window.__refreshCampaign) window.__refreshCampaign(); // バリデーションも同時更新
+    }
+
+    addBtn.addEventListener('click', function(){
+      var CAMPAIGN = getCampaign();
+      var cat = catSel.value; var name = planSel.value; var amount = Number((CAMPAIGN[cat]||{})[name]||0);
+      if(!amount){ var eb=getEl('err'); if(eb) eb.textContent='金額が取得できません（プラン定義を確認）'; return; }
+      tierCarts[currentTier].push({cat:cat, name:name, amount:amount, orig:amount, disc:0});
+      renderTierTable(); syncTotalsAndCards();
+    });
+
+    ['downPayment-campaign','months-campaign','bonus-campaign','bonus-summer-campaign','bonus-winter-campaign']
+      .forEach(function(id){ var el=getEl(id); if(el){ el.addEventListener('input', syncTotalsAndCards); el.addEventListener('change', syncTotalsAndCards); }});
+
+    // --- スワイプ/ドラッグで“中身”の入替（カード順は固定） ---
+    (function enableSwipeOrDrag(){
+      var startY=0, dy=0, act=null; var TH=40; // しきい値(px)
+
+      function start(e, card){
+        act = card; dy = 0; card.classList.add('swiping');
+        var y = (e.touches && e.touches[0]) ? e.touches[0].clientY : (e.clientY!=null ? e.clientY : 0);
+        startY = y;
+      }
+      function move(e){
+        if(!act) return;
+        var y = (e.touches && e.touches[0]) ? e.touches[0].clientY : (e.clientY!=null ? e.clientY : 0);
+        dy = y - startY;
+      }
+      function end(){
+        if(!act) return;
+        var card = act; act = null; card.classList.remove('swiping');
+        var tier = card.getAttribute('data-tier');
+        if(Math.abs(dy) > TH){
+          if(dy > 0){ // 下方向
+            if(tier==='matsu') window.__swapTierCarts('matsu','take');
+            else if(tier==='take') window.__swapTierCarts('take','ume');
+          }else{ // 上方向
+            if(tier==='ume') window.__swapTierCarts('ume','take');
+            else if(tier==='take') window.__swapTierCarts('take','matsu');
+          }
+        }
+        dy = 0; markActiveTier();
+      }
+
+      function bind(card){
+        if(window.PointerEvent){
+          card.style.cursor = 'grab';
+          card.addEventListener('pointerdown', function(e){ if(e.button!==0) return; card.setPointerCapture && card.setPointerCapture(e.pointerId); start(e, card); });
+          card.addEventListener('pointermove', function(e){ move(e); });
+          card.addEventListener('pointerup', function(){ end(); });
+          card.addEventListener('pointercancel', function(){ end(); });
+        }
+        // タッチ（フォールバック）
+        card.addEventListener('touchstart', function(e){ start(e, card); }, {passive:true});
+        card.addEventListener('touchmove', function(e){ move(e); }, {passive:true});
+        card.addEventListener('touchend', function(){ end(); }, {passive:true});
+        card.addEventListener('touchcancel', function(){ end(); }, {passive:true});
+        // マウス（フォールバック）
+        card.addEventListener('mousedown', function(e){ if(e.button!==0) return; start(e, card); });
+        window.addEventListener('mousemove', function(e){ move(e); });
+        window.addEventListener('mouseup', function(){ end(); });
+      }
+      document.querySelectorAll('.plan-card').forEach(bind);
+    })();
+
+    // 初期
+    setTier('matsu');
+  })();
+  </script>
+
+  <script>
+  // === Post-fix: Nexus方式の計算（テスト付き） + バリデーション・日付表示 ===
+  (function(){
+    function toJPY(n){ return '¥'+Math.max(0,Math.floor(n||0)).toLocaleString(); }
+    function compute(total, down, months, bonus, summerSel, winterSel){
+      var rate=0.008; // 月0.8%
+      var principal=Math.max(0,total-down);
+      var fee=Math.floor(principal*rate*months); // 1円単位の切り捨て
+      var years=Math.ceil(months/12);
+      var summer=['6','7','8'].includes(String(summerSel))?1:0;
+      var winter=['12','1'].includes(String(winterSel))?1:0;
+      var bonusSlots=(summer+winter);
+      var bonusCount = bonus>0 ? years*bonusSlots : 0;
+      var sum=principal+fee;
+      var bonusTotal=bonus*bonusCount;
+      var monthly = Math.floor(((sum - bonusTotal)/Math.max(1,months))/100)*100; // 100円単位切り捨て
+      var first = (sum - bonusTotal) - monthly*(Math.max(1,months)-1); // 端数は初回
+      var now=new Date(); var firstDate=new Date(now.getFullYear(), now.getMonth()+2, 1);
+      var lastDate=new Date(firstDate.getFullYear(), firstDate.getMonth()+(Math.max(1,months)-1), 1);
+      // 最初に到来するボーナス月
+      var selMonths=[]; if(['6','7','8'].indexOf(String(summerSel))>=0) selMonths.push(Number(summerSel)); if(['12','1'].indexOf(String(winterSel))>=0) selMonths.push(Number(winterSel));
+      var bonusFirstDate=null; if(bonus>0 && selMonths.length){ for(var i=0;i<months;i++){ var mm=((firstDate.getMonth()+1+i-1)%12)+1; if(selMonths.indexOf(mm)>=0){ bonusFirstDate=new Date(firstDate.getFullYear(), firstDate.getMonth()+i, 1); break; } } }
+      return {principal:principal, fee:fee, sum:sum, first:first, monthly:monthly, grand:sum+down, firstDate:firstDate, lastDate:lastDate, bonusCount:bonusCount, bonusTotal:bonusTotal, bonusFirstDate:bonusFirstDate};
+    }
+    function refresh(){
+      var total=Number(document.getElementById('total-campaign').value||0);
+      var down=Number(document.getElementById('downPayment-campaign').value||0);
+      var months=Number(document.getElementById('months-campaign').value||0);
+      var bonus=Number(document.getElementById('bonus-campaign').value||0);
+      var summer=document.getElementById('bonus-summer-campaign')?.value||'';
+      var winter=document.getElementById('bonus-winter-campaign')?.value||'';
+      var r=compute(total, down, months, bonus, summer, winter);
+      ['principal-campaign','fee-campaign','sum-campaign','first-campaign','monthly-campaign','grand-campaign']
+        .forEach(function(id,idx){ var val=[r.principal,r.fee,r.sum,r.first,r.monthly,r.grand][idx]; var el=document.getElementById(id); if(el) el.textContent=toJPY(val); });
+      function ym(d){ if(!d) return '-'; var y=d.getFullYear(); var m=('0'+(d.getMonth()+1)).slice(-2); return y+'年'+m+'月'; }
+      var fd=document.getElementById('first-date-campaign'); if(fd) fd.textContent=ym(r.firstDate);
+      var ld=document.getElementById('last-date-campaign'); if(ld) ld.textContent=ym(r.lastDate);
+      var bi=document.getElementById('bonus-info-campaign'); if(bi){ bi.textContent = (bonus>0? ('ボーナス回数: '+r.bonusCount+'回 / 合計: '+toJPY(r.bonusTotal)+(r.bonusFirstDate?(' / 初回: '+ym(r.bonusFirstDate)):'') ): 'なし'); }
+      var alerts=[];
+      if(bonus>0 && r.bonusCount>0){ var principalVal = Math.max(0,total - down); var limitTotal = Math.floor(principalVal*0.5); if(r.bonusTotal>limitTotal){ var perMax = r.bonusCount>0 ? Math.floor(limitTotal / r.bonusCount) : 0; alerts.push('ボーナス加算金合計はクレジット残金の50%以下にしてください。上限合計: '+toJPY(limitTotal)+' ／ 1回あたり目安: '+toJPY(perMax)); } }
+      if(r.monthly<1700){ alerts.push('2回目以降分割払金が1700円以上になるように頭金、回数、ボーナスをご設定ください'); }
+      var al=document.getElementById('alerts-campaign'); if(al) al.textContent=alerts.length?alerts.join('\n'):'OK';
+    }
+    // 他IIFEから共通呼び出し
+    window.__refreshCampaign = refresh;
+
+    ['total-campaign','downPayment-campaign','months-campaign','bonus-campaign','bonus-summer-campaign','bonus-winter-campaign','bonus-toggle-campaign']
+      .forEach(function(id){ var el=document.getElementById(id); if(el){ el.addEventListener('input', refresh); el.addEventListener('change', refresh); }});
+    // ボーナス on/off 表示切替
+    (function(){ var togg=document.getElementById('bonus-toggle-campaign'); var row=document.getElementById('bonus-row-campaign'); if(togg && row){ var sync=function(){ row.style.display=(togg.value==='on')?'grid':'none'; refresh(); }; togg.addEventListener('change', sync); sync(); } })();
+    // 初期計算
+    refresh();
+
+    // --- Mini tests from your samples ---
+    try{
+      var cases=[
+        {total:554420, down:35000, months:48, bonus:27000, summer:'6', winter:'12', exp:{fee:199457, monthly:10400, first:14077, grand:753877}},
+        {total:554420, down:3000, months:32, bonus:5000, summer:'6', winter:'12', exp:{fee:141163, monthly:20700, first:20883, grand:695583}},
+        {total:798975, down:5000, months:20, bonus:4000, summer:'6', winter:'12', exp:{fee:127036, monthly:45200, first:46211, grand:926011}},
+        {total:798975, down:10000, months:48, bonus:0, summer:'', winter:'', exp:{fee:302966, monthly:22700, first:25041, grand:1101941}},
+        {total:798975, down:5000, months:50, bonus:0, summer:'', winter:'', exp:{fee:317590, monthly:22200, first:23765, grand:1116565}}
+      ];
+      cases.forEach(function(c){ var r=compute(c.total,c.down,c.months,c.bonus,c.summer,c.winter); var ok = r.fee===c.exp.fee && r.monthly===c.exp.monthly && r.first===c.exp.first && r.grand===c.exp.grand; if(!ok) console.warn('[test NG]', c, r); else console.log('[test OK]', c); });
+    }catch(e){ console.warn('self tests skipped', e); }
+  })();
+  </script>
+</body>
+</html>
