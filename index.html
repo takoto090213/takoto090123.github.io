@@ -73,227 +73,51 @@
     .tab-content.active{display:block}
     .swipe-hint{margin-top:10px;font-size:12px;color:#5a6a7c}
   
-    /* POP UI (inline) */
-    .pop-section{margin:14px 0 18px}
-    .pop-section .pop-sub{font-size:12px;color:#5a6a7c;margin:6px 0 10px}
-    .pop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-    .pop-card{background:#fff;border:1px solid #e5eef8;border-radius:14px;box-shadow:0 1px 10px rgba(0,0,0,.05);overflow:hidden}
-    .pop-card .banner{padding:14px 14px 12px;background:linear-gradient(90deg,#e7f2ff,#e9f8f5)}
-    .pop-card .tag{display:inline-block;font-size:12px;font-weight:900;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid #dbe8f6;color:#143a55}
-    .pop-card .title{margin-top:8px;font-size:16px;font-weight:1000;color:#0e3352;letter-spacing:.2px}
-    .pop-card .hint{margin-top:4px;font-size:12px;color:#496073}
-    .pop-card .body{padding:12px 14px 14px}
-    .pop-list{display:flex;flex-direction:column;gap:8px}
-    .pop-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #eef3f9;border-radius:12px;padding:10px 10px;background:#fbfdff}
-    .pop-row .left{display:flex;flex-direction:column;gap:2px}
-    .pop-row .course{font-size:14px;font-weight:900;color:#123}
-    .pop-row .total{font-size:13px;font-weight:800;color:#0b62a4}
-    .pop-row button{border:1px solid #cfd9e6;background:#fff;border-radius:10px;padding:8px 10px;font-weight:900;cursor:pointer}
-    .pop-row button:hover{box-shadow:0 0 0 3px rgba(0,119,200,.08)}
-    
-
-    /* 料金表タブ：ミニプランカード */
-    .mini-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:10px 0 14px}
-    .mini-card{border:1px solid #dfe8f3;border-radius:12px;padding:10px;background:#fff;cursor:pointer}
-    .mini-card.active{box-shadow:0 0 0 3px rgba(0,123,255,.10)}
-    .mini-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .mini-title{font-weight:1000}
-    .mini-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-    .mini-badge{font-size:11px;font-weight:900;padding:3px 8px;border-radius:999px;border:1px solid #dbe8f6;background:#f5fbff;color:#0b62a4}
-    .mini-badge-custom{background:#fff6e7;border-color:#ffe0ad;color:#925a00}
-    .mini-price{font-size:18px;font-weight:1100;margin-top:6px}
-    .mini-monthly{font-size:12px;color:#496073;margin-top:2px}
-    .mini-planlist{margin-top:6px;display:flex;flex-direction:column;gap:4px;max-height:72px;overflow:auto;padding-right:2px}
-    .mini-planlist .planline{font-size:11px;line-height:1.25;color:#234}
-
-
 /* ===========================
-   POP THEME: Premium Aqua
-   - 清潔感(水色) + 高級感(余白/タイポ/コントラスト)
+   料金表タブ（POP表示 + ミニカード）
    =========================== */
-:root{
-  --pop-ink:#0F1F2E;
-  --pop-muted:#5E7388;
-  --pop-line:rgba(15,31,46,.10);
-  --pop-line-soft:rgba(15,31,46,.06);
-  --pop-accent:#1677C8;        /* 深めの水色 */
-  --pop-accent-soft:#EAF6FF;   /* うす水色 */
-  --pop-accent-glow:#F4FBFF;   /* さらに薄い */
+
+.right-hint{font-size:12px;color:#5E7388;font-weight:800;display:flex;align-items:center;justify-content:flex-end}
+.price-top{margin-bottom:10px}
+.mini-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width: 720px){
+  .mini-tiers{grid-template-columns:1fr;gap:8px}
 }
 
-.pop-section h2{
-  color:var(--pop-ink);
-  letter-spacing:.2px;
-  font-weight:900;
-}
-
-.pop-section .pop-sub{
-  color:var(--pop-muted);
-  line-height:1.55;
-}
-
-/* card */
-.pop-card{
-  border:1px solid var(--pop-line);
-  border-radius:18px;
-  box-shadow:0 1px 12px rgba(15,31,46,.05); /* 影は薄く */
+.mini-tier{
+  border:1px solid rgba(17,49,75,.10);
+  border-radius:16px;
   background:#fff;
-}
-
-.pop-card .banner{
-  padding:16px 16px 12px;
-  background:
-    radial-gradient(900px 220px at 12% 0%, rgba(22,119,200,.10), transparent 60%),
-    linear-gradient(180deg, var(--pop-accent-glow), #fff 70%);
-  border-bottom:1px solid var(--pop-line-soft);
-}
-
-.pop-card .tag{
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.35px;
-  text-transform:uppercase;
-  color:var(--pop-accent);
-  background:rgba(22,119,200,.06);
-  border:1px solid rgba(22,119,200,.18);
-  padding:4px 10px;
-}
-
-.pop-card .title{
-  margin-top:10px;
-  font-size:16px;
-  font-weight:1000;
-  color:var(--pop-ink);
-  letter-spacing:.15px;
-}
-
-.pop-card .hint{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--pop-muted);
-}
-
-.pop-card .body{
-  padding:14px 16px 16px;
-}
-
-/* rows */
-.pop-row{
-  border:1px solid var(--pop-line-soft);
-  background:#fff;
-  border-radius:14px;
+  box-shadow:0 10px 20px rgba(15,31,46,.06);
   padding:12px 12px;
+  text-align:left;
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
+.mini-tier:hover{transform:translateY(-1px);box-shadow:0 14px 26px rgba(15,31,46,.08)}
+.mini-tier.active{border-color:rgba(22,119,200,.35);box-shadow:0 0 0 3px rgba(22,119,200,.10),0 14px 26px rgba(15,31,46,.08)}
+.mini-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.mini-head .label{font-weight:1000;color:#0F1F2E;letter-spacing:.12px}
+.mini-head .sum{font-weight:1000;color:#1677C8}
+.mini-lines{margin-top:8px;font-size:12px;color:#5E7388;line-height:1.5;max-height:3.2em;overflow:hidden}
+.mini-lines .dot{display:inline-block;width:6px;height:6px;border-radius:999px;background:rgba(22,119,200,.35);margin-right:6px;transform:translateY(-1px)}
 
-.pop-row:hover{
-  border-color:rgba(22,119,200,.22);
-  box-shadow:0 4px 18px rgba(15,31,46,.06);
-}
+/* POP like */
+.pop-grid{display:flex;flex-direction:column;gap:14px;margin-top:12px}
 
-.pop-row .course{
-  font-size:14px;
-  font-weight:950;
-  color:var(--pop-ink);
-  letter-spacing:.1px;
-}
-
-.pop-row .total{
-  font-size:13px;
-  font-weight:900;
-  color:var(--pop-accent);
-}
-
-/* button: outline + subtle fill on hover */
-.pop-row button{
-  min-width:76px;
-  border-radius:12px;
-  border:1px solid rgba(22,119,200,.28);
-  background:#fff;
-  color:var(--pop-accent);
-  padding:9px 12px;
-  font-weight:950;
-  letter-spacing:.2px;
-}
-
-.pop-row button:hover{
-  background:rgba(22,119,200,.08);
-  box-shadow:0 0 0 3px rgba(22,119,200,.10);
-}
-
-.pop-row button:active{
-  transform:translateY(1px);
-}
-
-/* tighter, consistent grid spacing on large screens */
-@media (min-width: 900px){
-  .pop-grid{ gap:14px; }
-}
-
-
-/* Hide static helper text in 料金表POP section; hero includes guidance */
-.pop-section > .pop-sub:first-child{ display:none; }
-
-
-/* ===========================
-   POP LIKE UI (Screenshot style)
-   =========================== */
-.pop-grid{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-/* header "hero" */
 .pop-hero{
   border-radius:18px;
   padding:18px 18px 16px;
   background:
-    radial-gradient(900px 260px at 18% 0%, rgba(70, 145, 210, .20), transparent 60%),
-    linear-gradient(180deg, rgba(234, 246, 255, 1), rgba(255,255,255,1) 72%);
-  border:1px solid rgba(17, 49, 75, .08);
+    radial-gradient(900px 260px at 18% 0%, rgba(70,145,210,.20), transparent 60%),
+    linear-gradient(180deg, rgba(234,246,255,1), rgba(255,255,255,1) 72%);
+  border:1px solid rgba(17,49,75,.08);
   box-shadow:0 10px 26px rgba(15,31,46,.06);
 }
+.pop-hero-top{display:flex;align-items:center;gap:12px}
+.pop-hero-title{font-size:26px;font-weight:950;letter-spacing:.2px;color:#0F1F2E}
+.pop-hero-sub{margin-top:8px;font-size:14px;color:#5E7388}
 
-.pop-hero-inner{max-width:100%}
-.pop-hero-top{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.pop-hero-icon{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:rgba(22,119,200,1);
-  background:rgba(22,119,200,.10);
-  border:1px solid rgba(22,119,200,.16);
-  box-shadow:0 8px 18px rgba(15,31,46,.08);
-}
-.pop-hero-title{
-  font-size:26px;
-  font-weight:950;
-  letter-spacing:.2px;
-  color:#0F1F2E;
-}
-.pop-hero-sub{
-  margin-top:8px;
-  font-size:14px;
-  color:#5E7388;
-}
-
-/* group sub heading (when multiple pops in one category) */
-.pop-subhead{
-  margin:10px 0 0;
-  font-weight:900;
-  color:#0F1F2E;
-  opacity:.75;
-  letter-spacing:.14px;
-}
-
-/* each row */
 .pop-pill{
   display:flex;
   align-items:center;
@@ -302,32 +126,12 @@
   border-radius:18px;
   padding:16px 16px;
   background:#fff;
-  border:1px solid rgba(17, 49, 75, .08);
+  border:1px solid rgba(17,49,75,.08);
   box-shadow:0 10px 24px rgba(15,31,46,.06);
 }
-
-.pop-pill-left{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-width:0;
-}
-.pop-pill-left .k{
-  font-size:16px;
-  font-weight:950;
-  color:#0F1F2E;
-  letter-spacing:.12px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.pop-pill-left .v{
-  font-size:13px;
-  font-weight:900;
-  color:rgba(22,119,200,1);
-}
-
-/* Add button */
+.pop-pill-left{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pop-pill-left .k{font-size:16px;font-weight:950;color:#0F1F2E;letter-spacing:.12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pop-pill-left .v{font-size:13px;font-weight:900;color:rgba(22,119,200,1)}
 .pop-add{
   border:0;
   cursor:pointer;
@@ -337,32 +141,17 @@
   color:#fff;
   font-weight:950;
   letter-spacing:.2px;
-  background:linear-gradient(180deg, rgba(130, 175, 217, 1), rgba(64, 116, 171, 1));
-  box-shadow:
-    0 12px 24px rgba(15,31,46,.18),
-    inset 0 1px 0 rgba(255,255,255,.35);
+  background:linear-gradient(180deg, rgba(130,175,217,1), rgba(64,116,171,1));
+  box-shadow:0 12px 24px rgba(15,31,46,.18), inset 0 1px 0 rgba(255,255,255,.35);
 }
-.pop-add:hover{
-  filter:brightness(1.03);
-  box-shadow:
-    0 14px 28px rgba(15,31,46,.22),
-    inset 0 1px 0 rgba(255,255,255,.38);
-}
-.pop-add:active{
-  transform:translateY(1px);
-}
+.pop-add:hover{filter:brightness(1.03);box-shadow:0 14px 28px rgba(15,31,46,.22), inset 0 1px 0 rgba(255,255,255,.38)}
+.pop-add:active{transform:translateY(1px)}
 
-/* responsive tweaks */
-@media (max-width: 560px){
-  .pop-hero-title{font-size:22px}
-  .pop-pill{padding:14px 14px}
-  .pop-add{min-width:84px;padding:11px 14px}
+.price-status{
+  margin-top:10px;
+  font-size:12px;
+  color:#5E7388;
 }
-
-
-/* hide face icon in POP header */
-.pop-hero-icon{display:none !important;}
-.pop-hero-top{gap:0 !important;}
 
 </style>
 </head>
@@ -375,86 +164,33 @@
     <div class="tab" data-tab="normal">通常料金</div>
   </div>
 
-  
-  <!-- 料金表（キャンペーンPOP風UI） -->
+
+  <!-- 料金表 -->
   <section id="tab-price" class="tab-content">
     <div class="wrap">
+      <div class="price-top">
+        <div class="mini-tiers" id="price-mini-tiers" aria-label="編集ターゲット（料金表）"></div>
+      </div>
+
       <div class="row">
-        <label>編集ターゲット：</label>
-        <div class="pillset" role="tablist">
-          <div class="pill active" data-target="matsu" role="tab" aria-selected="true">プラン①</div>
-          <div class="pill" data-target="take" role="tab" aria-selected="false">プラン②</div>
-          <div class="pill" data-target="ume" role="tab" aria-selected="false">プラン③</div>
-        </div>
+        <label>カテゴリ<select id="price-cat"></select></label>
+        <div class="right-hint" id="price-target-hint">追加先：—</div>
       </div>
 
-      
-      <div class="mini-cards" id="mini-cards-price" aria-label="料金表タブ内のプラン①〜③ミニ表示">
-        <div class="mini-card active" data-tier="matsu" role="button" tabindex="0" aria-label="プラン①に切り替え">
-          <div class="mini-top">
-            <div class="mini-title">プラン①</div>
-            <div class="mini-badges">
-              <span class="mini-badge" id="mini-badge-matsu" hidden>学割</span>
-              <span class="mini-badge mini-badge-custom" id="mini-custbadge-matsu" hidden>別計算</span>
-            </div>
-          </div>
-          <div class="mini-price" id="mini-price-matsu">¥0</div>
-          <div class="mini-monthly" id="mini-monthly-tier-matsu">月々 —</div>
-          <div class="mini-planlist" id="mini-planlist-matsu"><span class="planline">（プラン未選択）</span></div>
+      <div class="pop-hero" id="price-hero" aria-label="料金表（POP）">
+        <div class="pop-hero-top">
+          <div class="pop-hero-title" id="price-hero-title">料金表</div>
         </div>
-
-        <div class="mini-card" data-tier="take" role="button" tabindex="0" aria-label="プラン②に切り替え">
-          <div class="mini-top">
-            <div class="mini-title">プラン②</div>
-            <div class="mini-badges">
-              <span class="mini-badge" id="mini-badge-take" hidden>学割</span>
-              <span class="mini-badge mini-badge-custom" id="mini-custbadge-take" hidden>別計算</span>
-            </div>
-          </div>
-          <div class="mini-price" id="mini-price-take">¥0</div>
-          <div class="mini-monthly" id="mini-monthly-tier-take">月々 —</div>
-          <div class="mini-planlist" id="mini-planlist-take"><span class="planline">（プラン未選択）</span></div>
-        </div>
-
-        <div class="mini-card" data-tier="ume" role="button" tabindex="0" aria-label="プラン③に切り替え">
-          <div class="mini-top">
-            <div class="mini-title">プラン③</div>
-            <div class="mini-badges">
-              <span class="mini-badge" id="mini-badge-ume" hidden>学割</span>
-              <span class="mini-badge mini-badge-custom" id="mini-custbadge-ume" hidden>別計算</span>
-            </div>
-          </div>
-          <div class="mini-price" id="mini-price-ume">¥0</div>
-          <div class="mini-monthly" id="mini-monthly-tier-ume">月々 —</div>
-          <div class="mini-planlist" id="mini-planlist-ume"><span class="planline">（プラン未選択）</span></div>
-        </div>
+        <div class="pop-hero-sub" id="price-hero-sub">回数（プラン）を選んで、プラン①〜③へ追加できます。</div>
       </div>
 
-<div class="row">
-        <label>カテゴリ<select id="pop-cat-select">
+      <div class="pop-grid" id="price-pop-list"></div>
 
-          <option value="ヒゲ">ヒゲ（眉小鼻無し）</option>
-          <option value="フェイス">フェイス</option>
-          <option value="どこでも脱毛">どこでも脱毛</option>
-          <option value="全身">全身</option>
-          <option value="全身ヒゲ">全身ヒゲ</option>
-          <option value="陰部">陰部</option>
-          <option value="眉小鼻">眉小鼻</option>
-          <option value="大人の身だしなみケアプラン">大人の身だしなみケアプラン</option>
-        
-        </select></label>
-      </div>
-
-      <div class="pop-section" aria-label="料金表（POP）">
-        <div class="pop-sub">選択カテゴリのPOPだけを表示します。回数ボタンを押すとキャンペーンのプラン①〜③へ追加されます。</div>
-        <div id="pop-status" style="margin:8px 0 10px;font-size:12px;color:#5E7388;display:none"></div>
-        <div class="pop-grid" id="pop-grid"></div>
-        <div id="pop-empty" class="pop-sub" style="display:none">このカテゴリのPOPはまだありません。</div>
-      </div>
+      <div class="price-status" id="price-status" role="status" aria-live="polite" style="display:none"></div>
     </div>
   </section>
 
-<!-- キャンペーン -->
+  <!-- キャンペーン -->
   <section id="tab-campaign" class="tab-content active">
     <div class="wrap">
       <div class="row">
@@ -483,7 +219,8 @@
         <label>選択プラン金額（税込）<input id="selected-plan-price-c" readonly value="0"></label>
         <div class="btn-wrap"><button id="add-plan-c" type="button">＋追加</button></div>
       </div>
-<div class="tiers" id="compare-cards" aria-label="プラン①〜③比較">
+
+      <div class="tiers" id="compare-cards" aria-label="プラン①〜③比較">
         <div class="plan-card swipe-shadow active" data-tier="matsu">
           <div class="title">プラン① <span class="ann" id="ann-matsu" hidden>頭金、ボーナス注意</span><span class="badge" id="badge-matsu" hidden>学割</span><span class="badge" id="custbadge-matsu" hidden>別計算</span></div>
           <div class="price" id="price-matsu">¥0</div>
@@ -830,124 +567,123 @@
     function anyStudent(t){return (tier[t]||[]).some(function(x){return !!x.student})}
 
     // --- Swipe reorder: プラン①〜③カードを上下スワイプで並び替え ---
-    function wireSwipeReorder(){
-      var container = document.getElementById('compare-cards');
-      if(!container) return;
+        function wireSwipeReorder(){
+      // ▼要望対応：
+      // - “長押し + スワイプ”の時だけ入れ替え（感度を下げる）
+      // - カードの並び／「プラン①〜③」ラベルは固定のまま、中身(tier/custom)だけを入れ替える
+      var order = ['matsu','take','ume'];
+      var HOLD_MS = 340;     // 長押し判定
+      var CANCEL_PX = 10;    // HOLD前に動いたらキャンセル
+      var SWAP_PX = 70;      // これ以上スワイプで入替
 
-      function list(){ return Array.prototype.slice.call(container.querySelectorAll('.plan-card')); }
+      function getPoint(ev){
+        if(ev.touches && ev.touches[0]) return {x:ev.touches[0].clientX, y:ev.touches[0].clientY};
+        return {x:ev.clientX, y:ev.clientY};
+      }
+      function neighbor(t, dir){
+        var idx = order.indexOf(t);
+        var n = idx + (dir > 0 ? 1 : -1);
+        if(n < 0 || n >= order.length) return null;
+        return order[n];
+      }
+      function swapContents(a, b){
+        if(!tier[a] || !tier[b]) return;
+        var tmp = tier[a]; tier[a] = tier[b]; tier[b] = tmp;
+        var tc = custom[a]; custom[a] = custom[b]; custom[b] = tc;
+        render(); refreshAll();
+      }
 
-      function swap(card, dir){
-        var arr = list();
-        var idx = arr.indexOf(card);
-        if(idx < 0) return;
-        var to = idx + (dir < 0 ? -1 : 1);
-        if(to < 0 || to >= arr.length) return;
-        var other = arr[to];
-        if(dir < 0){
-          container.insertBefore(card, other);
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.plan-card'));
+      cards.forEach(function(card){
+        var tierName = card.getAttribute('data-tier');
+
+        var tId = null;
+        var armed = false;
+        var swapped = false;
+        var start = {x:0, y:0};
+
+        function clearHold(){
+          if(tId){ clearTimeout(tId); tId = null; }
+          armed = false;
+          card.classList.remove('holding');
+        }
+
+        function onDown(ev){
+          // フォーム要素やリンク上では入替しない
+          if(ev.target && ev.target.closest && ev.target.closest('button, a, input, select, textarea')) return;
+
+          swapped = false;
+          card.__swipeJustSwapped = false;
+          start = getPoint(ev);
+
+          clearHold();
+          tId = setTimeout(function(){
+            armed = true;
+            card.classList.add('holding');
+          }, HOLD_MS);
+        }
+
+        function onMove(ev){
+          if(!tId && !armed) return;
+
+          var p = getPoint(ev);
+          var dx = p.x - start.x;
+          var dy = p.y - start.y;
+
+          // 長押し成立前に少しでも動いたらキャンセル
+          if(!armed){
+            if(Math.abs(dx) > CANCEL_PX || Math.abs(dy) > CANCEL_PX){
+              clearHold();
+            }
+            return;
+          }
+
+          if(swapped) return;
+          if(Math.abs(dy) < SWAP_PX) return;
+
+          var dir = dy > 0 ? 1 : -1;
+          var other = neighbor(tierName, dir);
+          if(!other) return;
+
+          swapped = true;
+          card.__swipeJustSwapped = true;
+          setTimeout(function(){ card.__swipeJustSwapped = false; }, 400);
+
+          swapContents(tierName, other);
+          clearHold();
+        }
+
+        function onUp(){
+          clearHold();
+        }
+
+        // Pointer優先（PC/スマホ両対応）
+        if(window.PointerEvent){
+          card.addEventListener('pointerdown', onDown, {passive:true});
+          card.addEventListener('pointermove', onMove, {passive:true});
+          card.addEventListener('pointerup', onUp, {passive:true});
+          card.addEventListener('pointercancel', onUp, {passive:true});
         }else{
-          container.insertBefore(other, card);
+          card.addEventListener('touchstart', onDown, {passive:true});
+          card.addEventListener('touchmove', onMove, {passive:true});
+          card.addEventListener('touchend', onUp, {passive:true});
+          card.addEventListener('touchcancel', onUp, {passive:true});
         }
-      }
+      });
 
-      function bindPointer(card){
-        if(card.__swipeBound) return;
-        card.__swipeBound = true;
-
-        var startX = 0, startY = 0;
-        var swapped = false;
-
-        function down(ev){
-          if(ev.target && ev.target.closest && ev.target.closest('button,a,input,select,textarea')) return;
-          card.classList.add('swiping');
-          swapped = false;
-          startX = ev.clientX;
-          startY = ev.clientY;
-          if(card.setPointerCapture) card.setPointerCapture(ev.pointerId);
-        }
-
-        function move(ev){
-          if(!card.classList.contains('swiping')) return;
-          if(swapped) return;
-          var dx = ev.clientX - startX;
-          var dy = ev.clientY - startY;
-          if(Math.abs(dy) < 38) return;
-          if(Math.abs(dy) < Math.abs(dx) + 12) return;
-
-          swap(card, dy < 0 ? -1 : 1);
-          swapped = true;
-          card.__swipeJustSwapped = true;
-          setTimeout(function(){ card.__swipeJustSwapped = false; }, 250);
-
-          if(ev.preventDefault) ev.preventDefault();
-        }
-
-        function end(){ card.classList.remove('swiping'); }
-
-        card.addEventListener('pointerdown', down);
-        card.addEventListener('pointermove', move);
-        card.addEventListener('pointerup', end);
-        card.addEventListener('pointercancel', end);
-        card.addEventListener('lostpointercapture', end);
-      }
-
-      function bindTouch(card){
-        if(card.__swipeBound) return;
-        card.__swipeBound = true;
-
-        var startX = 0, startY = 0;
-        var swapped = false;
-
-        function tstart(ev){
-          if(ev.target && ev.target.closest && ev.target.closest('button,a,input,select,textarea')) return;
-          var t = (ev.touches && ev.touches[0]) ? ev.touches[0] : null;
-          if(!t) return;
-          card.classList.add('swiping');
-          swapped = false;
-          startX = t.clientX;
-          startY = t.clientY;
-        }
-
-        function tmove(ev){
-          if(!card.classList.contains('swiping')) return;
-          if(swapped) return;
-          var t = (ev.touches && ev.touches[0]) ? ev.touches[0] : null;
-          if(!t) return;
-          var dx = t.clientX - startX;
-          var dy = t.clientY - startY;
-          if(Math.abs(dy) < 38) return;
-          if(Math.abs(dy) < Math.abs(dx) + 12) return;
-
-          swap(card, dy < 0 ? -1 : 1);
-          swapped = true;
-          card.__swipeJustSwapped = true;
-          setTimeout(function(){ card.__swipeJustSwapped = false; }, 250);
-
-          ev.preventDefault();
-        }
-
-        function tend(){ card.classList.remove('swiping'); }
-
-        card.addEventListener('touchstart', tstart, {passive:true});
-        card.addEventListener('touchmove', tmove, {passive:false});
-        card.addEventListener('touchend', tend);
-        card.addEventListener('touchcancel', tend);
-      }
-
-      list().forEach(function(card){
-        if(window.PointerEvent) bindPointer(card);
-        else bindTouch(card);
+      // ヒント文言も“長押し”に寄せる
+      document.querySelectorAll('.swipe-hint').forEach(function(el){
+        el.textContent = '長押しして↑↓で中身入替';
       });
     }
 
-    
-    function renderPlanLinesInto(t, wrap){
+    function renderPlanLines(t){
+      var wrap=el('planlist-'+t);
       if(!wrap) return;
       wrap.innerHTML='';
       var items=tier[t]||[];
       if(!items.length){
-        var empty=document.createElement('span'); empty.className='planline'; empty.textContent='（プラン未選択）';
-        wrap.appendChild(empty); return;
+        var empty=document.createElement('span'); empty.className='planline'; empty.textContent='（プラン未選択）'; wrap.appendChild(empty); return;
       }
       items.forEach(function(x){
         var o=+x.orig||+x.amount||0; var a=+x.amount||0; var d=Math.max(0,o-a);
@@ -958,15 +694,6 @@
       });
     }
 
-    function renderPlanLines(t){
-      renderPlanLinesInto(t, el('planlist-'+t));
-    }
-
-    function renderPlanLinesMini(t){
-      renderPlanLinesInto(t, el('mini-planlist-'+t));
-    }
-
-
     function mark(){
       document.querySelectorAll('.pill').forEach(function(p){
         var on=p.getAttribute('data-target')===current;
@@ -975,11 +702,7 @@
       document.querySelectorAll('.plan-card').forEach(function(c){
         c.classList.toggle('active',c.getAttribute('data-tier')===current);
       });
-    
-      document.querySelectorAll('.mini-card').forEach(function(c){
-        c.classList.toggle('active',c.getAttribute('data-tier')===current);
-      });
-}
+    }
 
     function compute(total,down,months,bonus,summer,winter){
       var rate=.008;
@@ -1131,41 +854,9 @@
         if(bd) bd.hidden=!anyStudent(t);
         if(bdc) bdc.hidden = (p.source!=='custom');
       });
-      refreshMiniCards();
-
     }
 
-    
-    function refreshMiniCards(){
-      ['matsu','take','ume'].forEach(function(t){
-        var p=el('mini-price-'+t), m=el('mini-monthly-tier-'+t), bd=el('mini-badge-'+t), bdc=el('mini-custbadge-'+t);
-        if(p) p.textContent = toJPY(sum(t));
-
-        // 月々は既存カードの表示を流用
-        var srcMonthly = el('monthly-tier-'+t);
-        if(m) m.textContent = srcMonthly ? srcMonthly.textContent : '月々 —';
-
-        renderPlanLinesMini(t);
-
-        if(bd) bd.hidden = !anyStudent(t);
-        var pinfo = getParams(t);
-        if(bdc) bdc.hidden = (pinfo.source!=='custom');
-      });
-    }
-
-    function bindMiniCardClicks(){
-      document.querySelectorAll('.mini-card').forEach(function(c){
-        function act(){
-          current=c.getAttribute('data-tier');
-          render(); refreshAll();
-        }
-        c.addEventListener('click', act);
-        c.addEventListener('keydown', function(e){
-          if(e.key==='Enter' || e.key===' '){ e.preventDefault(); act(); }
-        });
-      });
-    }
-function markRequired(){
+    function markRequired(){
       var d=el('downPayment-campaign'),m=el('months-campaign'),b=el('bonus-campaign'),t=el('bonus-toggle-campaign');
       if(d) d.classList.toggle('need-attn',(d.value===''));
       if(m) m.classList.toggle('need-attn',(m.value===''));
@@ -1346,28 +1037,36 @@ function markRequired(){
     });
 
     
-    function __bindMiniCards(){
-      document.querySelectorAll('.mini-card').forEach(function(c){
-        if(c.__miniBound) return;
-        c.__miniBound = true;
-
-        function activate(){
-          current = c.getAttribute('data-tier');
-          render(); refreshAll();
-        }
-
-        c.addEventListener('click', function(){ activate(); });
-        c.addEventListener('keydown', function(ev){
-          if(ev.key === 'Enter' || ev.key === ' '){
-            ev.preventDefault();
-            activate();
-          }
-        });
-      });
-    }
-
-    __bindMiniCards();
-    document.addEventListener('DOMContentLoaded', __bindMiniCards);
+    // 料金表タブなど外部UIから“現在のプラン①〜③”へ直接追加するためのAPI
+    window.__addCampaignPlanDirect = function(payload){
+      try{
+        payload = payload || {};
+        var cat  = String(payload.cat || '');
+        var name = String(payload.name || payload.plan || '');
+        var amt  = Number(payload.amount || payload.total || 0) || 0;
+        if(!(amt > 0)) return {ok:false, reason:'amount'};
+        if(!tier[current]) return {ok:false, reason:'tier'};
+        tier[current].push({cat:cat, name:name, amount:amt, orig:amt, disc:0, student:false});
+        render(); refreshAll();
+        return {ok:true, tier:current};
+      }catch(e){
+        return {ok:false, reason:String(e && (e.message||e))};
+      }
+    };
+    window.__getCurrentTier = function(){ return current; };
+    window.__setCurrentTier = function(t){
+      if(tier[t]){
+        current = t;
+        render(); refreshAll();
+        return true;
+      }
+      return false;
+    };
+    window.__getTierView = function(t){
+      t = t || current;
+      var items = (tier[t]||[]).map(function(x){ return {cat:x.cat, name:x.name, amount:x.amount}; });
+      return {tier:t, total: sum(t), items: items};
+    };
 
 document.addEventListener('DOMContentLoaded',function(){
       wireSwipeReorder();
@@ -1386,45 +1085,12 @@ document.addEventListener('DOMContentLoaded',function(){
 
     // 既存データを維持
     var NORMAL = {
-      '顔・首全体': {
-        '全部位': {1:86400, 4:308560, 8:618480, 12:928380},
-        '口下': {1:10800, 4:38800, 8:77760, 12:116400},
-        '両ほほ': {1:10800, 4:38800, 8:77760, 12:116400},
-        '両もみあげ': {1:10800, 4:38800, 8:77760, 12:116400},
-        '鼻下': {1:10800, 4:38800, 8:77760, 12:116400},
-        'あご': {1:10800, 4:38800, 8:77760, 12:116400},
-        'あご下・首': {1:11880, 4:42700, 8:85400, 12:128100},
-        'まゆ上・眉間': {1:11880, 4:42700, 8:85400, 12:128100},
-        '小鼻': {1:10800, 4:38800, 8:77760, 12:116400}
+      'ヒゲ': {
+        '口回り': {1: 25000, 4: 85000, 8: 140000, 12: 180000},
+        '頬・もみあげ': {1: 25000, 4: 85000, 8: 140000, 12: 180000}
       },
-      '上半身': {
-        '全部位': {1:86500, 4:310400, 8:620800, 12:931200},
-        '手の指': {1:3800, 4:13600, 8:27200, 12:40800},
-        '手の甲': {1:5300, 4:19000, 8:38000, 12:57000},
-        'ひじ下': {1:10800, 4:38800, 8:77600, 12:116400},
-        'ひじ上': {1:10800, 4:38800, 8:77600, 12:116400},
-        '胸全体': {1:10800, 4:38800, 8:77600, 12:116400},
-        '腹全体': {1:10800, 4:38800, 8:77600, 12:116400},
-        '乳輪周り': {1:5300, 4:19000, 8:38000, 12:57000},
-        'へそ周り': {1:5300, 4:19000, 8:38000, 12:57000},
-        '両わき': {1:5300, 4:19000, 8:38000, 12:57000},
-        '肩': {1:5300, 4:19000, 8:38000, 12:57000},
-        '背中上': {1:6500, 4:23400, 8:46800, 12:70200},
-        '背中下': {1:6500, 4:23400, 8:46800, 12:70200}
-      },
-      '下半身': {
-        '全部位': {1:87400, 4:314600, 8:629200, 12:943800},
-        '足の指': {1:9200, 4:33100, 8:66200, 12:99300},
-        '足の甲': {1:14200, 4:51100, 8:102200, 12:153300},
-        'ひざ下': {1:32000, 4:115200, 8:230400, 12:345600},
-        'ひざ上': {1:32000, 4:115200, 8:230400, 12:345600}
-      },
-      'デリケート': {
-        '全部位': {1:88000, 4:316800, 8:633600, 12:950400},
-        'Vライン': {1:22000, 4:79200, 8:158400, 12:237600},
-        'Iライン': {1:22000, 4:79200, 8:158400, 12:237600},
-        'Oライン': {1:22000, 4:79200, 8:158400, 12:237600},
-        'おしり': {1:22000, 4:79200, 8:158400, 12:237600}
+      'フェイス': {
+        'フェイス全体': {1: 30000, 4: 100000, 8: 165000, 12: 210000}
       }
     };
 
@@ -1598,326 +1264,162 @@ document.addEventListener('DOMContentLoaded',function(){
   </script>
 
 
-  <!-- POP UI SCRIPT -->
+  <!-- PRICE_TAB_SCRIPT -->
   <script>
   (function(){
     'use strict';
+    var ORDER = ['matsu','take','ume'];
+    function el(id){ return document.getElementById(id); }
+    function toJPY(n){ return '¥' + Math.max(0, Math.floor(n||0)).toLocaleString(); }
+    function labelOf(t){ return t==='matsu'?'プラン①':t==='take'?'プラン②':'プラン③'; }
 
-    // POP -> キャンペーン選択を確実に同期する（料金表タブの追加ボタン用）
-    function setCampaignSelection(cat, plan){
-      var catSel = document.getElementById('cat-select-c');
-      var planSel = document.getElementById('plan-select-c');
-      if(!catSel || !planSel) return false;
-
-      catSel.value = cat;
-
-      // プラン一覧を更新（両方を実行：関数呼び出し + changeイベント）
-      try{ if(window.__reloadCampaignPlans) window.__reloadCampaignPlans(); }catch(e){}
-      fireChange(catSel);
-
-      var want = normKey(plan);
-      var opts = Array.prototype.slice.call(planSel.options || []);
-      var found = opts.find(function(o){ return normKey(o.value) === want; }) ||
-                  opts.find(function(o){ return normKey(o.textContent) === want; });
-
-      if(!found) return false;
-
-      planSel.value = found.value;
-      fireChange(planSel);
-      return true;
+    function showStatus(msg){
+      var s = el('price-status');
+      if(!s) return;
+      s.style.display = 'block';
+      s.textContent = msg;
     }
 
-    function addSelected(){
-      var btn = document.getElementById('add-plan-c');
-      if(!btn || btn.disabled) return false;
-      btn.click();
-      return true;
-    }
+    function renderMini(){
+      var root = el('price-mini-tiers');
+      if(!root || !window.__getTierView) return;
 
+      var cur = window.__getCurrentTier ? window.__getCurrentTier() : 'matsu';
+      var hint = el('price-target-hint');
+      if(hint) hint.textContent = '追加先：' + labelOf(cur);
 
+      root.innerHTML = '';
+      ORDER.forEach(function(t){
+        var view = window.__getTierView(t);
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mini-tier' + (t===cur?' active':'');
+        btn.setAttribute('data-tier', t);
 
-    function normKey(s){
-      return String(s||'').replace(/保障/g,'保証').replace(/　/g,' ').replace(/\s+/g,' ').trim();
-    }
-    function toJPY(n){
-      return '¥' + Math.max(0, Math.floor(n||0)).toLocaleString();
-    }
-    function fireChange(el){
-      if(!el) return;
-      try{ el.dispatchEvent(new Event('change', {bubbles:true})); }
-      catch(e){ try{ var ev=document.createEvent('Event'); ev.initEvent('change',true,true); el.dispatchEvent(ev);}catch(_){} }
-    }
+        var lines = (view.items||[]).slice(0,2).map(function(x){
+          return '<div><span class="dot"></span>' + (x.cat?('['+x.cat+'] '):'') + x.name + '</div>';
+        }).join('');
 
-    // POPデータ（PDF内容を元にしたUI）
-    var POPS = [
-      { tag:'どこでも脱毛', title:'どこでも20分脱毛（新規）', cat:'どこでも脱毛', items:[
-        {label:'8回', plan:'20分8回（保証20％）', total:129800},
-        {label:'12回', plan:'20分12回（保証20％）', total:178000},
-        {label:'12回+1年', plan:'20分12回+1年（保証20％）', total:309000},
-        {label:'12回+1年+プラチナ', plan:'20分12回+1年プラチナ（保証50％）', total:359000}
-      ]},
-      { tag:'どこでも脱毛', title:'どこでも40分脱毛（新規）', cat:'どこでも脱毛', items:[
-        {label:'4回', plan:'40分4回（保証20％）', total:119800},
-        {label:'8回', plan:'40分8回（保証20％）', total:228000},
-        {label:'12回', plan:'40分12回（保証20％）', total:329000},
-        {label:'12回+1年', plan:'40分12回+1年（保証20％）', total:569000},
-        {label:'12回+1年+プラチナ', plan:'40分12回+1年プラチナ（保証50％）', total:619000}
-      ]},
-      { tag:'全身', title:'全身+(ヒゲorVIO)脱毛（新規）', cat:'全身', items:[
-        {label:'4回', plan:'4回（保証20％）', total:196800},
-        {label:'8回', plan:'8回（保証20％）', total:359750},
-        {label:'12回', plan:'12回（保証20％）', total:506480},
-        {label:'12回+1年', plan:'12回+1年（保証20％）', total:795160},
-        {label:'12回+1年+プラチナ', plan:'12回+1年プラチナ（保証50％）', total:845160}
-      ]},
-      { tag:'全身', title:'全身オール脱毛（新規）', cat:'全身ヒゲ', items:[
-        {label:'4回', plan:'4回（保証20％）', total:213400},
-        {label:'8回', plan:'8回（保証20％）', total:396640},
-        {label:'12回', plan:'12回（保証20％）', total:554420},
-        {label:'12回+1年', plan:'12回+1年（保証20％）', total:887750},
-        {label:'12回+1年+プラチナ', plan:'12回+1年プラチナ（保証50％）', total:937750},
-        {label:'EP12回+1年プラチナ', plan:'EP12回+1年プラチナ（保証50％）', total:1054420}
-      ]},
-      { tag:'VIO', title:'VIO脱毛（新規）', cat:'陰部', items:[
-        {label:'4回', plan:'4回（保証20％）', total:98300},
-        {label:'8回', plan:'8回（保証20％）', total:194420},
-        {label:'12回', plan:'12回（保証20％）', total:279970},
-        {label:'12回+1年', plan:'12回+1年（保証20％）', total:448860},
-        {label:'12回+1年+プラチナ', plan:'12回+1年プラチナ（保証50％）', total:498860}
-      ]},
-      { tag:'フェイス', title:'フェイス脱毛（新規）', cat:'フェイス', items:[
-        {label:'8回', plan:'8回（保証20％）', total:158430},
-        {label:'12回', plan:'12回（保証20％）', total:197000},
-        {label:'12回+1年', plan:'12回+1年（保証20％）', total:326890},
-        {label:'12回+1年+EP', plan:'EP12回+1年（保証20％）', total:374260},
-        {label:'12回+1年+EP+プラチナ', plan:'EP12回+1年プラチナ（保証50％）', total:424260}
-      ]},
-      { tag:'ヒゲ', title:'ヒゲ脱毛（新規）', cat:'ヒゲ', items:[
-        {label:'8回', plan:'8回（保証20％）', total:110660},
-        {label:'12回', plan:'12回（保証20％）', total:143770},
-        {label:'12回+1年', plan:'12回+1年（保証20％）', total:277750},
-        {label:'12回+1年+EP', plan:'EP12回+1年（保証20％）', total:339800},
-        {label:'12回+1年+EP+プラチナ', plan:'EP12回+1年プラチナ（保証50％）', total:389800}
-      ]},
-      { tag:'眉小鼻', title:'まゆ・小鼻脱毛', cat:'眉小鼻', items:[
-        {label:'4回', plan:'4回', total:40000},
-        {label:'8回', plan:'8回', total:68250},
-        {label:'12回', plan:'12回', total:81900}
-      ]}
-    ];
+        if(!lines) lines = '<div style="opacity:.8">（未追加）</div>';
 
-    function selectAndAdd(cat, plan){
-      var catSel = document.getElementById('cat-select-c');
-      var planSel = document.getElementById('plan-select-c');
-      var addBtn  = document.getElementById('add-plan-c');
-      if(!catSel || !planSel || !addBtn) return false;
-
-      if(catSel.value !== cat){
-        catSel.value = cat;
-        fireChange(catSel);
-      }
-
-      requestAnimationFrame(function(){
-        var want = normKey(plan);
-        var opts = Array.prototype.slice.call(planSel.options || []);
-        var found = opts.find(function(o){ return normKey(o.value) === want; });
-        if(!found){
-          var err = document.getElementById('err');
-          if(err) err.textContent = 'POP連携: プランが見つかりません → ['+cat+'] '+plan;
-          return;
-        }
-        planSel.value = found.value;
-        fireChange(planSel);
-        requestAnimationFrame(function(){ addBtn.click(); });
-      });
-
-      return true;
-    }
-
-    var syncing = false;
-    function syncCategoryFromCampaign(){
-      if(syncing) return;
-      var camp = document.getElementById('cat-select-c');
-      var pop  = document.getElementById('pop-cat-select');
-      if(!camp || !pop) return;
-      syncing = true;
-      pop.value = camp.value;
-      syncing = false;
-      render();
-    }
-    function syncCategoryToCampaign(){
-      if(syncing) return;
-      var camp = document.getElementById('cat-select-c');
-      var pop  = document.getElementById('pop-cat-select');
-      if(!camp || !pop) return;
-      syncing = true;
-      camp.value = pop.value;
-      fireChange(camp);
-      syncing = false;
-      render();
-    }
-
-    
-    // --- 動的POP：キャンペーン定義を参照してPOPを生成（例：大人の身だしなみケアプラン） ---
-    function buildPopFromCampaignCategory(cat){
-      try{
-        var camp = (window.__getCampaign ? window.__getCampaign() : null);
-        if(!camp || !camp[cat] || typeof camp[cat] !== 'object') return [];
-        var dict = camp[cat];
-        var keys = Object.keys(dict).filter(function(k){ return dict[k]!=null; });
-        if(keys.length === 0) return [];
-
-        var items = keys.map(function(name){
-          return {
-            label: name,          // POPの「回数/コース名」として表示
-            plan: name,           // 追加時に選択するプラン名（キャンペーンのプラン名と一致）
-            total: Number(dict[name]) || 0
-          };
-        });
-
-        // 並び替え：○回があれば回数順、それ以外は金額順
-        function getTimes(s){
-          var m = String(s||'').match(/(\d+)\s*回/);
-          return m ? Number(m[1]) : null;
-        }
-        items.sort(function(a,b){
-          var ta=getTimes(a.label), tb=getTimes(b.label);
-          if(ta!=null && tb!=null) return ta-tb;
-          if(ta!=null) return -1;
-          if(tb!=null) return  1;
-          if((a.total||0)!==(b.total||0)) return (a.total||0)-(b.total||0);
-          return String(a.label).localeCompare(String(b.label));
-        });
-
-        return [{
-          tag: '料金表',
-          title: cat + '（キャンペーン参照）',
-          cat: cat,
-          items: items
-        }];
-      }catch(e){
-        return [];
-      }
-    }
-
-    function render(){
-      var grid = document.getElementById('pop-grid');
-      if(!grid) return;
-
-      var popSel = document.getElementById('pop-cat-select');
-      var cat = popSel ? popSel.value : '';
-      var empty = document.getElementById('pop-empty');
-
-      var all = POPS.concat(buildPopFromCampaignCategory('大人の身だしなみケアプラン'));
-      var filtered = all.filter(function(p){ return !cat || p.cat === cat; });
-
-      grid.innerHTML = '';
-
-      if(!filtered.length){
-        if(empty) empty.style.display = 'block';
-        return;
-      }
-      if(empty) empty.style.display = 'none';
-
-      // --- Hero (スクリーンショット寄せ) ---
-      var hero = document.createElement('div');
-      hero.className = 'pop-hero';
-
-      var titleText = (filtered.length === 1 && filtered[0] && filtered[0].title) ? filtered[0].title : (cat || '料金表');
-      hero.innerHTML =
-        '<div class="pop-hero-inner">' +
-          '<div class="pop-hero-top">' +
-            '' +
-            '<div class="pop-hero-title">' + titleText + '</div>' +
+        btn.innerHTML =
+          '<div class="mini-head">' +
+            '<div class="label">' + labelOf(t) + '</div>' +
+            '<div class="sum">' + toJPY(view.total||0) + '</div>' +
           '</div>' +
-          '<div class="pop-hero-sub">回数を押すとプラン①〜③へ追加</div>' +
-        '</div>' +
-        '<div class="pop-hero-rule"></div>';
+          '<div class="mini-lines">' + lines + '</div>';
 
-      grid.appendChild(hero);
+        btn.addEventListener('click', function(){
+          if(window.__setCurrentTier) window.__setCurrentTier(t);
+          renderMini();
+        });
 
-      function esc(s){
-        return String(s==null?'':s)
-          .replace(/&/g,'&amp;')
-          .replace(/</g,'&lt;')
-          .replace(/>/g,'&gt;')
-          .replace(/"/g,'&quot;')
-          .replace(/'/g,'&#39;');
+        root.appendChild(btn);
+      });
+    }
+
+    function sortPlans(keys){
+      function times(s){
+        var m = String(s||'').match(/(\d+)\s*回/);
+        return m ? Number(m[1]) : null;
+      }
+      return keys.slice().sort(function(a,b){
+        var ta=times(a), tb=times(b);
+        if(ta!=null && tb!=null && ta!==tb) return ta-tb;
+        if(ta!=null && tb==null) return -1;
+        if(ta==null && tb!=null) return  1;
+        return String(a).localeCompare(String(b), 'ja');
+      });
+    }
+
+    function renderPOP(){
+      var list = el('price-pop-list');
+      var title = el('price-hero-title');
+      if(!list) return;
+
+      var cat = (el('price-cat') && el('price-cat').value) || '';
+      var camp = (window.__getCampaign ? window.__getCampaign() : null) || {};
+      var dict = camp[cat] || {};
+
+      if(title) title.textContent = cat ? (cat + ' の料金表') : '料金表';
+
+      list.innerHTML = '';
+
+      var keys = Object.keys(dict);
+      keys = sortPlans(keys);
+
+      keys.forEach(function(name){
+        var amt = Number(dict[name]) || 0;
+
+        var row = document.createElement('div');
+        row.className = 'pop-pill';
+        row.innerHTML =
+          '<div class="pop-pill-left">' +
+            '<div class="k">' + name + '</div>' +
+            '<div class="v">総額 ' + toJPY(amt) + '</div>' +
+          '</div>' +
+          '<button type="button" class="pop-add">追加</button>';
+
+        row.querySelector('button').addEventListener('click', function(){
+          if(!window.__addCampaignPlanDirect){
+            showStatus('追加に失敗しました（内部APIが未初期化）');
+            return;
+          }
+          var res = window.__addCampaignPlanDirect({cat: cat, name: name, amount: amt});
+          if(res && res.ok){
+            showStatus('追加しました：' + name + ' / ' + toJPY(amt) + ' → ' + labelOf(res.tier));
+            renderMini();
+          }else{
+            showStatus('追加に失敗しました：' + (res && res.reason ? res.reason : 'unknown'));
+          }
+        });
+
+        list.appendChild(row);
+      });
+
+      if(keys.length === 0){
+        var empty = document.createElement('div');
+        empty.style.cssText = 'padding:14px 6px;color:#5E7388;font-size:13px';
+        empty.textContent = 'このカテゴリには表示できるプランがありません。';
+        list.appendChild(empty);
+      }
+    }
+
+    function init(){
+      // populate categories from campaign definition
+      var sel = el('price-cat');
+      var camp = (window.__getCampaign ? window.__getCampaign() : null) || {};
+      if(sel){
+        sel.innerHTML = '';
+        Object.keys(camp).sort(function(a,b){ return String(a).localeCompare(String(b), 'ja'); }).forEach(function(cat){
+          var opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat;
+          sel.appendChild(opt);
+        });
+
+        // default select: ヒゲ if exists
+        if(camp['ヒゲ']) sel.value = 'ヒゲ';
+        sel.addEventListener('change', function(){
+          renderPOP();
+        });
       }
 
-      // --- Items ---
-      filtered.forEach(function(pop){
-        if(filtered.length > 1){
-          var sh = document.createElement('div');
-          sh.className = 'pop-subhead';
-          sh.textContent = pop.title || '';
-          grid.appendChild(sh);
-        }
+      renderMini();
+      renderPOP();
 
-        (pop.items || []).forEach(function(it){
-          var pill = document.createElement('div');
-          pill.className = 'pop-pill';
-
-          pill.innerHTML =
-            '<div class="pop-pill-left">' +
-              '<div class="k">' + esc(it.label) + '</div>' +
-              '<div class="v">総額 ' + esc(toJPY(it.total)) + '</div>' +
-            '</div>' +
-            '<button class="pop-add" type="button">追加</button>';
-
-          pill.querySelector('button').addEventListener('click', function(){
-            // まずは“直接追加API”があればそれを使う（カテゴリ/プラン選択に依存しない）
-            var direct = null;
-            try{
-              if(window.__addCampaignPlanDirect){
-                direct = window.__addCampaignPlanDirect({cat: pop.cat, name: it.plan, amount: it.total});
-              }
-            }catch(e){ direct = {ok:false, reason:String(e && (e.message||e))}; }
-
-            if(direct && direct.ok){
-              var st = document.getElementById('pop-status');
-              if(st){
-                st.style.display='block';
-                st.textContent = '追加しました：' + it.label + ' / ' + toJPY(it.total) + ' → プラン' + (direct.tier==='matsu'?'①':direct.tier==='take'?'②':'③');
-              }
-              return;
-            }
-
-            // 直接追加が使えない場合は従来方式（キャンペーンのセレクト→追加ボタン）
-            var ok = setCampaignSelection(pop.cat, it.plan);
-            if(!ok){
-              var err = document.getElementById('err');
-              if(err) err.textContent = 'POP連携: プランが見つかりません → ['+pop.cat+'] '+it.plan;
-              var st=document.getElementById('pop-status');
-              if(st){ st.style.display='block'; st.textContent='追加できません：プランが見つかりません（' + pop.cat + ' / ' + it.plan + '）'; }
-              return;
-            }
-            requestAnimationFrame(function(){
-              var ok2 = addSelected();
-              var st = document.getElementById('pop-status');
-              if(st){
-                st.style.display='block';
-                st.textContent = ok2 ? ('追加しました：' + it.label + ' / ' + toJPY(it.total)) : '追加に失敗しました（キャンペーン側の追加ボタンが無効です）';
-              }
-            });
-          });
-
-          grid.appendChild(pill);
+      // when switching tabs, refresh mini & pop so state is always current
+      document.querySelectorAll('.tab').forEach(function(t){
+        t.addEventListener('click', function(){
+          if(t.getAttribute('data-tab') === 'price'){
+            renderMini();
+            renderPOP();
+          }
         });
       });
     }
 
-
-    document.addEventListener('DOMContentLoaded', function(){
-      syncCategoryFromCampaign();
-
-      var camp = document.getElementById('cat-select-c');
-      var pop  = document.getElementById('pop-cat-select');
-      if(camp) camp.addEventListener('change', syncCategoryFromCampaign);
-      if(pop)  pop.addEventListener('change', syncCategoryToCampaign);
-
-      render();
-    });
+    document.addEventListener('DOMContentLoaded', init);
   })();
   </script>
 
