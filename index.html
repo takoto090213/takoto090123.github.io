@@ -66,6 +66,10 @@
 
     .ops{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
 
+    /* バリデーション（カード列）と出力ボタンの間の余白 */
+    .quote-ops{margin-top:16px; padding-top:12px; border-top:1px solid rgba(17,49,75,.12)}
+    .ops .status{font-size:12px; color:#5E7388; margin-left:6px}
+
     .tabs{display:flex;gap:8px;justify-content:center;margin:10px 0}
     .tab{padding:8px 14px;border:1px solid #dde6f1;border-bottom:none;background:#e0e7ef;color:#123;font-weight:700;border-radius:10px 10px 0 0;cursor:pointer}
     .tab.active{background:#fff;color:var(--brand);box-shadow:inset 0 -4px 0 var(--brand2)}
@@ -282,7 +286,13 @@
           <div class="card"><h3>最終お支払い年月</h3><p id="last-date-campaign">-</p></div>
           <div class="card"><h3>ボーナス情報</h3><p id="bonus-info-campaign">-</p></div>
           <div class="card"><h3>バリデーション</h3><p id="alerts-campaign">-</p></div>
+        
+        <div class="ops quote-ops">
+          <button type="button" id="btn-copy-campaign">結果をコピー</button>
+          <button type="button" id="btn-print-campaign">見積もり表示（印刷/PDF）</button>
+          <span class="status" id="status-campaign" aria-live="polite"></span>
         </div>
+</div>
       </div>
       <div id="err" class="error" aria-live="polite"></div>
     </div>
@@ -353,6 +363,11 @@
           <div class="card"><h3>最終お支払い年月</h3><p id="last-date-normal">-</p></div>
           <div class="card"><h3>ボーナス情報</h3><p id="bonus-info-normal">-</p></div>
           <div class="card"><h3>バリデーション</h3><p id="alerts-normal">-</p></div>
+        </div>
+        <div class="ops quote-ops">
+          <button type="button" id="btn-copy-normal">結果をコピー</button>
+          <button type="button" id="btn-print-normal">見積もり表示（印刷/PDF）</button>
+          <span class="status" id="status-normal" aria-live="polite"></span>
         </div>
       </div>
     </div>
@@ -553,6 +568,17 @@
 
   <!-- キャンペーン：計算とUI（プラン行DOM描画版） -->
   <script>
+    // Shared helper across script tags (used by bonus info and copy/print)
+    function formatBonusMonths(summer, winter){
+      var parts=[];
+      var s=String(summer||''), w=String(winter||'');
+      if(['6','7','8'].indexOf(s)>=0) parts.push('夏: '+s+'月');
+      if(['12','1'].indexOf(w)>=0) parts.push('冬: '+w+'月');
+      return parts.length?parts.join(' / '):'-';
+    }
+</script>
+
+<script>
   (function(){
     'use strict';
 
@@ -767,7 +793,7 @@
       return {
         down:Math.max(0,num('downPayment-campaign')),
         months:Math.max(1,num('months-campaign')),
-        bonus:Math.max(0,num('bonus-campaign')),
+        bonus:((el('bonus-toggle-campaign')||{}).value==='on')?Math.max(0,num('bonus-campaign')):0,
         summer:(el('bonus-summer-campaign')||{}).value||'',
         winter:(el('bonus-winter-campaign')||{}).value||'',
         source:'global'
@@ -885,7 +911,10 @@
       });
       var fd=el('first-date-campaign'); if(fd) fd.textContent=ym(r.firstDate);
       var ld=el('last-date-campaign'); if(ld) ld.textContent=ym(r.lastDate);
-      var bi=el('bonus-info-campaign'); if(bi) bi.textContent=(p.bonus>0?('ボーナス回数: '+r.bonusCount+'回 / 合計: '+toJPY(r.bonusTotal)):'なし');
+      var bi=el('bonus-info-campaign');
+      var bt=el('bonus-toggle-campaign');
+      var bOn=(bt&&bt.value==='on');
+      if(bi) bi.textContent = bOn ? ('あり（1回: '+toJPY(p.bonus)+' / '+formatBonusMonths(p.summer,p.winter)+' / 回数: '+r.bonusCount+'回 / 合計: '+toJPY(r.bonusTotal)+'）') : 'なし';
       var alerts=buildAlerts(total);
       var al=el('alerts-campaign'); if(al) al.textContent=alerts.length?alerts.join('\n'):'OK';
       refreshCards(); mark(); markRequired();
@@ -1086,44 +1115,45 @@ document.addEventListener('DOMContentLoaded',function(){
     // 既存データを維持
     var NORMAL = {
       '顔・首全体': {
-        '全部位': {1: 86400, 4: 308560, 8: 618480, 12: 928380},
-        '口下': {1: 10800, 4: 38800, 8: 77760, 12: 116400},
-        '両ほほ': {1: 10800, 4: 38800, 8: 77760, 12: 116400},
-        '両もみあげ': {1: 10800, 4: 38800, 8: 77760, 12: 116400},
-        '鼻下': {1: 10800, 4: 38800, 8: 77760, 12: 116400},
-        'あご': {1: 10800, 4: 38800, 8: 77760, 12: 116400},
-        'あご下・首': {1: 11880, 4: 42700, 8: 85400, 12: 128100},
-        'まゆ上・眉間': {1: 11880, 4: 42700, 8: 85400, 12: 128100},
-        '小鼻': {1: 10800, 4: 38800, 8: 77760, 12: 116400}
+        'フェイス全部位': {1:86400, 4:308560, 8:618480, 12:928380},
+        'ヒゲ全部位':     {1:64800, 4:227060, 8:455320, 12:683880},
+        '口下':           {1:10800, 4:38800, 8:77760,  12:116400},
+        '両ほほ':         {1:10800, 4:38800, 8:77760,  12:116400},
+        '両もみあげ':     {1:10800, 4:38800, 8:77760,  12:116400},
+        '鼻下':           {1:10800, 4:38800, 8:77760,  12:116400},
+        'あご':           {1:10800, 4:38800, 8:77760,  12:116400},
+        'あご下・首':     {1:11880, 4:42700, 8:85400,  12:128100},
+        'まゆ上・眉間':   {1:11880, 4:42700, 8:85400,  12:128100},
+        '小鼻':           {1:10800, 4:38800, 8:77760,  12:116400}
       },
       '上半身': {
-        '全部位': {1: 86500, 4: 310400, 8: 620800, 12: 931200},
-        '手の指': {1: 3800, 4: 13600, 8: 27200, 12: 40800},
-        '手の甲': {1: 5300, 4: 19000, 8: 38000, 12: 57000},
-        'ひじ下': {1: 10800, 4: 38800, 8: 77600, 12: 116400},
-        'ひじ上': {1: 10800, 4: 38800, 8: 77600, 12: 116400},
-        '胸全体': {1: 10800, 4: 38800, 8: 77600, 12: 116400},
-        '腹全体': {1: 10800, 4: 38800, 8: 77600, 12: 116400},
-        '乳輪周り': {1: 5300, 4: 19000, 8: 38000, 12: 57000},
-        'へそ周り': {1: 5300, 4: 19000, 8: 38000, 12: 57000},
-        '両わき': {1: 5300, 4: 19000, 8: 38000, 12: 57000},
-        '肩': {1: 5300, 4: 19000, 8: 38000, 12: 57000},
-        '背中上': {1: 6500, 4: 23400, 8: 46800, 12: 70200},
-        '背中下': {1: 6500, 4: 23400, 8: 46800, 12: 70200}
+        '全部位':   {1:86500, 4:310400, 8:620800, 12:931200},
+        '手の指':   {1:3800,  4:13600,  8:27200,  12:40800},
+        '手の甲':   {1:5300,  4:19000,  8:38000,  12:57000},
+        'ひじ下':   {1:10800, 4:38800,  8:77600,  12:116400},
+        'ひじ上':   {1:10800, 4:38800,  8:77600,  12:116400},
+        '胸全体':   {1:10800, 4:38800,  8:77600,  12:116400},
+        '腹全体':   {1:10800, 4:38800,  8:77600,  12:116400},
+        '乳輪周り': {1:5300,  4:19000,  8:38000,  12:57000},
+        'へそ周り': {1:5300,  4:19000,  8:38000,  12:57000},
+        '両わき':   {1:5300,  4:19000,  8:38000,  12:57000},
+        '肩':       {1:5300,  4:19000,  8:38000,  12:57000},
+        '背中上':   {1:6500,  4:23400,  8:46800,  12:70200},
+        '背中下':   {1:6500,  4:23400,  8:46800,  12:70200}
       },
       '下半身': {
-        '全部位': {1: 87400, 4: 314600, 8: 629200, 12: 943800},
-        '足の指': {1: 9200, 4: 33100, 8: 66200, 12: 99300},
-        '足の甲': {1: 14200, 4: 51100, 8: 102200, 12: 153300},
-        'ひざ下': {1: 32000, 4: 115200, 8: 230400, 12: 345600},
-        'ひざ上': {1: 32000, 4: 115200, 8: 230400, 12: 345600}
+        '全部位': {1:87400, 4:314600, 8:629200, 12:943800},
+        '足の指': {1:9200,  4:33100,  8:66200,  12:99300},
+        '足の甲': {1:14200, 4:51100,  8:102200, 12:153300},
+        'ひざ下': {1:32000, 4:115200, 8:230400, 12:345600},
+        'ひざ上': {1:32000, 4:115200, 8:230400, 12:345600}
       },
       'デリケート': {
-        '全部位': {1: 88000, 4: 316800, 8: 633600, 12: 950400},
-        'Vライン': {1: 22000, 4: 79200, 8: 158400, 12: 237600},
-        'Iライン': {1: 22000, 4: 79200, 8: 158400, 12: 237600},
-        'Oライン': {1: 22000, 4: 79200, 8: 158400, 12: 237600},
-        'おしり': {1: 22000, 4: 79200, 8: 158400, 12: 237600}
+        '全部位': {1:88000, 4:316800, 8:633600, 12:950400},
+        'Vライン': {1:22000, 4:79200,  8:158400, 12:237600},
+        'Iライン': {1:22000, 4:79200,  8:158400, 12:237600},
+        'Oライン': {1:22000, 4:79200,  8:158400, 12:237600},
+        'おしり':  {1:22000, 4:79200,  8:158400, 12:237600}
       }
     };
 
@@ -1217,7 +1247,7 @@ document.addEventListener('DOMContentLoaded',function(){
         ['first-normal','monthly-normal','principal-normal','fee-normal','sum-normal','grand-normal'].forEach(function(id){ var e=el(id); if(e) e.textContent='¥0'; });
         if(el('first-date-normal')) el('first-date-normal').textContent='-';
         if(el('last-date-normal')) el('last-date-normal').textContent='-';
-        if(el('bonus-info-normal')) el('bonus-info-normal').textContent='-';
+        if(el('bonus-info-normal')) el('bonus-info-normal').textContent=(bonusToggle && bonusToggle.value==='on') ? ('あり（1回: '+toJPY(bonus)+' / '+formatBonusMonths(summer,winter)+' / 回数: '+r.bonusCount+'回 / 合計: '+toJPY(r.bonusTotal)+'）') : 'なし';
         if(el('alerts-normal')) el('alerts-normal').textContent='-';
         return;
       }
@@ -1451,6 +1481,240 @@ document.addEventListener('DOMContentLoaded',function(){
         });
       });
     }
+
+    
+        
+    // ===== Quote export (Copy / Print) - DOM based (no internal-state dependency) =====
+    function safeText(id){
+      var e = el(id);
+      return e ? String(e.textContent || '').trim() : '';
+    }
+    function safeVal(id){
+      var e = el(id);
+      return e ? String(e.value || '').trim() : '';
+    }
+    function safeNum(id){
+      var v = parseInt(safeVal(id).replace(/,/g,''), 10);
+      return isFinite(v) ? v : 0;
+    }
+    function activeCampaignTarget(){
+      var pill = document.querySelector('#tab-campaign .pillset .pill.active');
+      return pill ? (pill.getAttribute('data-target') || 'matsu') : 'matsu';
+    }
+    function campaignPlanLines(t){
+      var wrap = el('planlist-' + t);
+      if(!wrap) return ['（プラン未選択）'];
+      var nodes = wrap.querySelectorAll('.planline');
+      var out = [];
+      for(var i=0;i<nodes.length;i++){
+        var s = String(nodes[i].textContent || '').trim();
+        if(s) out.push(s);
+      }
+      return out.length ? out : ['（プラン未選択）'];
+    }
+    function normalPlanLines(){
+      var body = el('normal-combo-body');
+      if(!body) return ['（テーブル未入力）'];
+      var rows = body.querySelectorAll('tr');
+      if(!rows.length) return ['（テーブル未入力）'];
+      var out = [];
+      for(var i=0;i<rows.length;i++){
+        var tds = rows[i].querySelectorAll('td');
+        var cat = tds[0] ? String(tds[0].textContent||'').trim() : '';
+        var item= tds[1] ? String(tds[1].textContent||'').trim() : '';
+        var course=tds[2] ? String(tds[2].textContent||'').trim() : '';
+        var amt = tds[3] ? String(tds[3].textContent||'').trim() : '';
+        out.push((i+1)+'. '+cat+' / '+item+' / '+course+' : '+amt);
+      }
+      return out;
+    }
+    function formatBonusMonthsLocal(summer, winter){
+      try{
+        if(typeof formatBonusMonths === 'function') return formatBonusMonths(summer, winter);
+      }catch(_e){}
+      var parts=[];
+      if(summer) parts.push('夏: '+summer+'月');
+      if(winter) parts.push('冬: '+winter+'月');
+      return parts.length?parts.join(' / '):'-';
+    }
+
+    function buildQuoteText(mode){
+      var isCampaign = mode === 'campaign';
+      var title = isCampaign ? 'キャンペーン見積もり' : '通常料金見積もり';
+      var now = new Date();
+      var stamp = now.getFullYear()+'-'+('0'+(now.getMonth()+1)).slice(-2)+'-'+('0'+now.getDate()).slice(-2)+' '+('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
+
+      var lines=[];
+      lines.push(title);
+      lines.push('作成日時: ' + stamp);
+      lines.push('――――――――――');
+
+      if(isCampaign){
+        var t = activeCampaignTarget();
+        lines.push('ターゲット: ' + labelOf(t));
+        lines.push('【内訳】');
+        var items = campaignPlanLines(t);
+        for(var i=0;i<items.length;i++) lines.push((i+1)+'. '+items[i]);
+
+        lines.push('――――――――――');
+        var total = safeNum('total-campaign');
+        var down  = safeNum('downPayment-campaign');
+        var months= safeVal('months-campaign') || '-';
+        var bonusToggle = safeVal('bonus-toggle-campaign') || 'off';
+        var bonusAmt = (bonusToggle==='on') ? safeNum('bonus-campaign') : 0;
+        var summer = safeVal('bonus-summer-campaign');
+        var winter = safeVal('bonus-winter-campaign');
+
+        lines.push('プラン総額（税込）: ' + toJPY(total));
+        lines.push('頭金: ' + toJPY(down));
+        lines.push('支払い回数: ' + months + '回');
+        lines.push('ボーナス利用: ' + (bonusToggle==='on' ? 'あり' : 'なし'));
+        lines.push('ボーナス1回の金額: ' + toJPY(bonusAmt));
+        lines.push('ボーナス月: ' + formatBonusMonthsLocal(summer, winter));
+
+        lines.push('――――――――――');
+        lines.push('クレジット残高: ' + safeText('principal-campaign'));
+        lines.push('分割手数料: ' + safeText('fee-campaign'));
+        lines.push('初回のお支払い: ' + safeText('first-campaign'));
+        lines.push('2回目以降のお支払い: ' + safeText('monthly-campaign'));
+        lines.push('支払総額（頭金含む）: ' + safeText('grand-campaign'));
+        lines.push('初回お支払い年月（2か月後）: ' + safeText('first-date-campaign'));
+        lines.push('最終お支払い年月: ' + safeText('last-date-campaign'));
+        return lines.join('\n');
+      }
+
+      // normal
+      lines.push('【内訳】');
+      var itemsN = normalPlanLines();
+      for(var j=0;j<itemsN.length;j++) lines.push(itemsN[j]);
+
+      lines.push('――――――――――');
+      var totalN = safeNum('total-normal');
+      var downN  = safeNum('downPayment-normal');
+      var monthsN= safeVal('months-normal') || '-';
+      var bonusToggleN = safeVal('bonus-toggle-normal') || 'off';
+      var bonusAmtN = (bonusToggleN==='on') ? safeNum('bonus-normal') : 0;
+      var summerN = safeVal('bonus-summer-normal');
+      var winterN = safeVal('bonus-winter-normal');
+
+      lines.push('プラン総額（税込）: ' + toJPY(totalN));
+      lines.push('頭金: ' + toJPY(downN));
+      lines.push('支払い回数: ' + monthsN + '回');
+      lines.push('ボーナス利用: ' + (bonusToggleN==='on' ? 'あり' : 'なし'));
+      lines.push('ボーナス1回の金額: ' + toJPY(bonusAmtN));
+      lines.push('ボーナス月: ' + formatBonusMonthsLocal(summerN, winterN));
+
+      lines.push('――――――――――');
+      lines.push('クレジット残高: ' + safeText('principal-normal'));
+      lines.push('分割手数料: ' + safeText('fee-normal'));
+      lines.push('初回のお支払い: ' + safeText('first-normal'));
+      lines.push('2回目以降のお支払い: ' + safeText('monthly-normal'));
+      lines.push('支払総額（頭金含む）: ' + safeText('grand-normal'));
+      lines.push('初回お支払い年月（2か月後）: ' + safeText('first-date-normal'));
+      lines.push('最終お支払い年月: ' + safeText('last-date-normal'));
+      return lines.join('\n');
+    }
+
+    function copyToClipboard(text, statusEl){
+      function done(msg){
+        if(statusEl){
+          statusEl.textContent = msg;
+          setTimeout(function(){ statusEl.textContent=''; }, 1800);
+        }
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){ done('コピーしました'); }).catch(function(){
+          try{
+            var ta=document.createElement('textarea');
+            ta.value=text; ta.setAttribute('readonly','');
+            ta.style.position='fixed'; ta.style.left='-9999px';
+            document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta);
+            done('コピーしました');
+          }catch(e){ done('コピーに失敗しました'); }
+        });
+        return;
+      }
+      try{
+        var ta2=document.createElement('textarea');
+        ta2.value=text; ta2.setAttribute('readonly','');
+        ta2.style.position='fixed'; ta2.style.left='-9999px';
+        document.body.appendChild(ta2);
+        ta2.select(); document.execCommand('copy');
+        document.body.removeChild(ta2);
+        done('コピーしました');
+      }catch(e2){ done('コピーに失敗しました'); }
+    }
+
+    function buildPrintHtml(mode){
+      var txt = buildQuoteText(mode);
+      var esc = function(s){
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      };
+      var lines = txt.split('\n').map(function(l){
+        if(l==='――――――――――') return '<hr>';
+        return '<div class="line">'+esc(l)+'</div>';
+      }).join('');
+      return '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">'+
+        '<title>見積もり</title><style>'+
+        'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Hiragino Sans","Noto Sans JP",sans-serif;padding:18px;color:#111}'+
+        '.line{font-size:13px;line-height:1.55;white-space:pre-wrap}'+
+        'hr{border:none;border-top:1px solid #ddd;margin:12px 0}'+
+        '@media print{body{padding:0}}'+
+        '</style></head><body>'+lines+'</body></html>';
+    }
+
+    function openPrint(mode){
+      var htmlStr = buildPrintHtml(mode);
+      // Prefer hidden iframe (popup-blocker friendly)
+      var frame=document.createElement('iframe');
+      frame.style.position='fixed';
+      frame.style.right='0'; frame.style.bottom='0';
+      frame.style.width='0'; frame.style.height='0';
+      frame.style.border='0';
+      frame.setAttribute('aria-hidden','true');
+      document.body.appendChild(frame);
+
+      var doc = frame.contentWindow && frame.contentWindow.document;
+      if(!doc){
+        var w = window.open('', '_blank');
+        if(!w){ alert('ポップアップがブロックされました。'); try{document.body.removeChild(frame);}catch(_e0){} return; }
+        w.document.open(); w.document.write(htmlStr); w.document.close();
+        w.focus(); w.print();
+        return;
+      }
+      doc.open(); doc.write(htmlStr); doc.close();
+      try{
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+      }catch(e){
+        var w2 = window.open('', '_blank');
+        if(w2){
+          w2.document.open(); w2.document.write(htmlStr); w2.document.close();
+          w2.focus(); w2.print();
+        }else{
+          alert('印刷が開始できませんでした。');
+        }
+      }
+      setTimeout(function(){ try{ document.body.removeChild(frame); }catch(_e3){} }, 1500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      var bc = el('btn-copy-campaign');
+      var pc = el('btn-print-campaign');
+      var sc = el('status-campaign');
+      if(bc) bc.addEventListener('click', function(){ copyToClipboard(buildQuoteText('campaign'), sc); });
+      if(pc) pc.addEventListener('click', function(){ openPrint('campaign'); });
+
+      var bn = el('btn-copy-normal');
+      var pn = el('btn-print-normal');
+      var sn = el('status-normal');
+      if(bn) bn.addEventListener('click', function(){ copyToClipboard(buildQuoteText('normal'), sn); });
+      if(pn) pn.addEventListener('click', function(){ openPrint('normal'); });
+    });
+
+
 
     document.addEventListener('DOMContentLoaded', init);
   })();
