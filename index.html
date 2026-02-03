@@ -76,7 +76,7 @@
     .tab-content{display:none;background:#fff;padding:18px;border-radius:0 0 12px 12px;box-shadow:0 2px 10px rgba(0,0,0,.08);max-width:1200px;margin:0 auto 20px;border:1px solid #eef3f9}
     .tab-content.active{display:block}
     .swipe-hint{margin-top:10px;font-size:12px;color:#5a6a7c}
-  
+
 /* ===========================
    料金表タブ（POP表示 + ミニカード）
    =========================== */
@@ -212,10 +212,13 @@
           <option value="フェイス">フェイス</option>
           <option value="どこでも脱毛">どこでも脱毛</option>
           <option value="全身">全身</option>
-          <option value="全身ヒゲ">全身ヒゲ</option>
+          <option value="全身オール">全身オール</option>
           <option value="陰部">陰部</option>
           <option value="眉小鼻">眉小鼻</option>
           <option value="大人の身だしなみケアプラン">大人の身だしなみケアプラン</option>
+          <option value="EPフェイス">EPフェイス</option>
+          <option value="EP上半身+下半身">EP上半身+下半身</option>
+          <option value="EP上半身+下半身+陰部">EP上半身+下半身+陰部</option>
         </select></label>
         <label>プラン<select id="plan-select-c"></select></label>
       </div>
@@ -286,7 +289,7 @@
           <div class="card"><h3>最終お支払い年月</h3><p id="last-date-campaign">-</p></div>
           <div class="card"><h3>ボーナス情報</h3><p id="bonus-info-campaign">-</p></div>
           <div class="card"><h3>バリデーション</h3><p id="alerts-campaign">-</p></div>
-        
+
         <div class="ops quote-ops">
           <button type="button" id="btn-copy-campaign">結果をコピー</button>
           <button type="button" id="btn-print-campaign">見積もり表示（印刷/PDF）</button>
@@ -417,85 +420,138 @@
   <script>
   (function(){
     function clone(o){return JSON.parse(JSON.stringify(o||{}))}
-    var D={
-      'ヒゲ':{
-        '8回（保証20％）':110660,
-        '12回（保証20％）':143770,
-        '12回+1年（保証20％）':277750,
-        'EP12回+1年（保証20％）':339800,
-        'EP12回+1年プラチナ（保証50％）':389800
+    var D = {
+      "ヒゲ": {
+        "8回（保証20％）": 110660,
+        "12回（保証20％）": 153770,
+        "2年間通い放題（保証20％）": 297750,
+        "EP2年間通い放題（保証20％）": 339800,
+        "EP2年間通い放題プラチナ（保証50％）": 389800
       },
-      'フェイス':{
-        '8回（保証20％）':158430,
-        '12回（保証20％）':197000,
-        '12回+1年（保証20％）':326890,
-        'EP12回+1年（保証20％）':374260,
-        'EP12回+1年プラチナ（保証50％）':424260
+      "フェイス": {
+        "8回（保証20％）": 158430,
+        "12回（保証20％）": 197000,
+        "2年通い放題（保証20％）": 326890,
+        "EP2年間通い放題（保証20％）": 374260,
+        "EP2年間通い放題プラチナ（保証50％）": 424260
       },
-      'どこでも脱毛':{
-        '20分8回（保証20％）':129800,
-        '20分12回（保証20％）':178000,
-        '20分12回+1年（保証20％）':309000,
-        '20分12回+1年プラチナ（保証50％）':359000,
-        '40分4回（保証20％）':119800,
-        '40分8回（保証20％）':228000,
-        '40分12回（保証20％）':329000,
-        '40分12回+1年（保証20％）':569000,
-        '40分12回+1年プラチナ（保証50％）':619000
+      "どこでも脱毛": {
+        "20分8回（保証20％）": 129800,
+        "20分12回（保証20％）": 178000,
+        "20分2年間通い放題年（保証20％）": 309000,
+        "20分2年間通い放題プラチナ（保証50％）": 359000,
+        "40分4回（保証20％）": 119800,
+        "40分8回（保証20％）": 228000,
+        "40分12回（保証20％）": 329000,
+        "40分2年間通い放題（保証20％）": 569000,
+        "40分2年間通い放題プラチナ（保証50％）": 619000
       },
-      '陰部':{
-        '4回（保証20％）':98300,
-        '8回（保証20％）':194420,
-        '12回（保証20％）':279970,
-        '12回+1年（保証20％）':448860,
-        '12回+1年プラチナ（保証50％）':498860
+      "全身": {
+        "4回（保証20％）": 196800,
+        "8回（保証20％）": 359750,
+        "12回（保証20％）": 506480,
+        "2年間通い放題（保証20％）": 795160,
+        "2年間通い放題プラチナ（保証50％）": 845160
       },
-      '全身':{
-        '4回（保証20％）':196800,
-        '8回（保証20％）':359750,
-        '12回（保証20％）':506480,
-        '12回+1年（保証20％）':795160,
-        '12回+1年プラチナ（保証50％）':845160
+      "全身オール": {
+        "4回（保証20％）": 213400,
+        "8回（保証20％）": 396640,
+        "12回（保証20％）": 554420,
+        "2年間通い放題（保証20％）": 887750,
+        "2年間通い放題プラチナ（保証50％）": 937750,
+        "EP2年間通い放題プラチナ（保証50％）": 1054420
       },
-      '全身ヒゲ':{
-        '4回（保証20％）':213400,
-        '8回（保証20％）':396640,
-        '12回（保証20％）':554420,
-        '12回+1年（保証20％）':887750,
-        '12回+1年プラチナ（保証50％）':937750,
-        'EP12回+1年プラチナ（保証50％）':1054420
+      "陰部": {
+        "4回（保証20％）": 98300,
+        "8回（保証20％）": 194420,
+        "12回（保証20％）": 279970,
+        "2年間通い放題（保証20％）": 448860,
+        "2年間通い放題プラチナ（保証50％）": 498860
       },
-      // ★差し替え済み：眉小鼻（キャンペーン）
-      '眉小鼻':{
-        '4回':40000,
-        '8回':68250,
-        '12回':81900
+      "眉小鼻": {
+        "4回": 40000,
+        "8回": 68250,
+        "12回": 81900
       },
-      '大人の身だしなみケアプラン':{
-        '口回りセット8回':60000,'ヒゲ全体セット8回':72000,'ひじ下、手の甲指セット8回':60000,
-        '胸腹セット8回':78000,'上半身セット8回':132000,'下半身セット8回':120000,
-        'VIOおしりセット8回':174000,'選べる2点セット8回':117000,'選べる3セット8回':171000
+      "大人の身だしなみケアプラン": {
+        "口回りセット4回": 30000,
+        "口回りセット8回": 60000,
+        "ヒゲ全体セット4回": 36000,
+        "ヒゲ全体セット8回": 72000,
+        "ひじ下、手の甲指セット4回": 30000,
+        "ひじ下、手の甲指セット8回": 60000,
+        "胸腹セット4回": 39000,
+        "胸腹セット8回": 78000,
+        "上半身セット4回": 66000,
+        "上半身セット8回": 132000,
+        "下半身セット4回": 60000,
+        "下半身セット8回": 120000,
+        "VIOおしりセット4回": 87000,
+        "VIOおしりセット8回": 174000,
+        "選べる2点セット4回": 58500,
+        "選べる2点セット8回": 117000,
+        "選べる3セット4回": 85500,
+        "選べる3セット8回": 171000
+      },
+      "EPフェイス": {
+        "4回": 99980,
+        "8回": 174273,
+        "12回": 216700
+      },
+      "EP上半身+下半身": {
+        "4回": 88800,
+        "8回": 159840,
+        "12回": 213120
+      },
+      "EP上半身+下半身+陰部": {
+        "4回": 129800,
+        "8回": 233640,
+        "12回": 311520
       }
     };
 
     function migrate(o){
-      var x=clone(o||{});
-      Object.keys(D).forEach(function(k){ x[k]=Object.assign({}, D[k], x[k]||{}) });
-      // localStorage に古い眉小鼻定義が残っていても必ず差し替える
-      x['眉小鼻']=Object.assign({}, D['眉小鼻']);
-      Object.keys(x).forEach(function(cat){
-        var src=x[cat]||{}; var dst={}; var seen=new Set();
-        Object.keys(src).forEach(function(k){
-          var nk=(k||'').replace(/保障/g,'保証').replace(/　/g,' ').replace(/\s+/g,' ').trim();
-          if(!seen.has(nk)){
-            dst[nk]=src[k];
-            seen.add(nk);
-          }
-        });
-        x[cat]=dst;
+      var src = clone(o||{});
+      // Dを“正”として、旧データ（localStorage）は同名キーの上書きだけ許可する
+      // ＝カテゴリ/プランの入れ替えが確実に反映され、旧カテゴリ（例: 全身ヒゲ）や旧プランが混ざらない
+      var x = clone(D);
+
+      Object.keys(src).forEach(function(cat){
+        if(cat === '全身ヒゲ'){
+          // 旧カテゴリ名 → 現行は「全身オール」
+          return;
+        }
+        if(D[cat]){
+          var dst = Object.assign({}, D[cat]);
+          var sdict = src[cat] || {};
+          Object.keys(sdict).forEach(function(k){
+            if(Object.prototype.hasOwnProperty.call(D[cat], k)){
+              dst[k] = sdict[k];
+            }
+          });
+          x[cat] = dst;
+        }else{
+          // Dに存在しないカテゴリは「ユーザー追加カテゴリ」として残す（末尾に追加される）
+          x[cat] = src[cat];
+        }
       });
+
+      Object.keys(x).forEach(function(cat){
+        var src2 = x[cat] || {};
+        var dst2 = {};
+        var seen = new Set();
+        Object.keys(src2).forEach(function(k){
+          var nk = (k||'').replace(/保障/g,'保証').replace(/　/g,' ').replace(/\s+/g,' ').trim();
+          if(seen.has(nk)) return;
+          dst2[nk] = src2[k];
+          seen.add(nk);
+        });
+        x[cat] = dst2;
+      });
+
       return x;
     }
+
 
     function get(){
       try{ var raw=localStorage.getItem('CAMPAIGN_DEF'); if(raw){ var o=JSON.parse(raw); if(o&&typeof o==='object') return migrate(o) } }
@@ -525,7 +581,9 @@
       var M=get(); var dict=M[c.value]||{};
       p.innerHTML='';
 
-      var keys=Object.keys(dict);
+      var baseKeys = (D && D[c.value]) ? Object.keys(D[c.value]) : [];
+      var keys = baseKeys.slice();
+      Object.keys(dict).forEach(function(k){ if(keys.indexOf(k)===-1) keys.push(k); });
       if(!keys.length){
         var op=document.createElement('option'); op.value=''; op.textContent='（このカテゴリにプランがありません）';
         p.appendChild(op);
@@ -1065,7 +1123,7 @@
       });
     });
 
-    
+
     // 料金表タブなど外部UIから“現在のプラン①〜③”へ直接追加するためのAPI
     window.__addCampaignPlanDirect = function(payload){
       try{
@@ -1247,7 +1305,7 @@ document.addEventListener('DOMContentLoaded',function(){
         ['first-normal','monthly-normal','principal-normal','fee-normal','sum-normal','grand-normal'].forEach(function(id){ var e=el(id); if(e) e.textContent='¥0'; });
         if(el('first-date-normal')) el('first-date-normal').textContent='-';
         if(el('last-date-normal')) el('last-date-normal').textContent='-';
-        if(el('bonus-info-normal')) el('bonus-info-normal').textContent=(bonusToggle && bonusToggle.value==='on') ? ('あり（1回: '+toJPY(bonus)+' / '+formatBonusMonths(summer,winter)+' / 回数: '+r.bonusCount+'回 / 合計: '+toJPY(r.bonusTotal)+'）') : 'なし';
+        if(el('bonus-info-normal')) el('bonus-info-normal').textContent='-';
         if(el('alerts-normal')) el('alerts-normal').textContent='-';
         return;
       }
@@ -1409,8 +1467,9 @@ document.addEventListener('DOMContentLoaded',function(){
       list.innerHTML = '';
 
       var keys = Object.keys(dict);
-      keys = sortPlans(keys);
-
+      // 表示順は定義(D)の順に合わせる
+      // // 表示順は定義(D)の順に合わせる
+      // keys = sortPlans(keys);
       keys.forEach(function(name){
         var amt = Number(dict[name]) || 0;
 
@@ -1454,7 +1513,7 @@ document.addEventListener('DOMContentLoaded',function(){
       var camp = (window.__getCampaign ? window.__getCampaign() : null) || {};
       if(sel){
         sel.innerHTML = '';
-        Object.keys(camp).sort(function(a,b){ return String(a).localeCompare(String(b), 'ja'); }).forEach(function(cat){
+        Object.keys(camp).forEach(function(cat){
           var opt = document.createElement('option');
           opt.value = cat;
           opt.textContent = cat;
@@ -1482,8 +1541,8 @@ document.addEventListener('DOMContentLoaded',function(){
       });
     }
 
-    
-        
+
+
     // ===== Quote export (Copy / Print) - DOM based (no internal-state dependency) =====
     function safeText(id){
       var e = el(id);
