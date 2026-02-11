@@ -215,7 +215,7 @@
           <option value="全身オール">全身オール</option>
           <option value="陰部">陰部</option>
           <option value="眉小鼻">眉小鼻</option>
-          <option value="大人の身だしなみケアプラン">大人の身だしなみケアプラン</option>
+          <option value="特別メニュー">特別メニュー</option>
           <option value="EPフェイス">EPフェイス</option>
           <option value="EP上半身+下半身">EP上半身+下半身</option>
           <option value="EP上半身+下半身+陰部">EP上半身+下半身+陰部</option>
@@ -471,7 +471,7 @@
         "8回": 68250,
         "12回": 81900
       },
-      "大人の身だしなみケアプラン": {
+      "特別メニュー": {
         "口回りセット4回": 30000,
         "口回りセット8回": 60000,
         "ヒゲ全体セット4回": 36000,
@@ -485,11 +485,7 @@
         "下半身セット4回": 60000,
         "下半身セット8回": 120000,
         "VIOおしりセット4回": 87000,
-        "VIOおしりセット8回": 174000,
-        "選べる2点セット4回": 58500,
-        "選べる2点セット8回": 117000,
-        "選べる3セット4回": 85500,
-        "選べる3セット8回": 171000
+        "VIOおしりセット8回": 174000
       },
       "EPフェイス": {
         "4回": 99980,
@@ -508,43 +504,91 @@
       }
     };
 
-    function migrate(o){
-      var src = clone(o||{});
-      // Dを“正”として、旧データ（localStorage）は同名キーの上書きだけ許可する
-      // ＝カテゴリ/プランの入れ替えが確実に反映され、旧カテゴリ（例: 全身ヒゲ）や旧プランが混ざらない
-      var x = clone(D);
+    var CAMPAIGN_DEF_VERSION = '2026-02-11-v17';
 
-      Object.keys(src).forEach(function(cat){
-        if(cat === '全身ヒゲ'){
-          // 旧カテゴリ名 → 現行は「全身オール」
-          return;
-        }
-        if(D[cat]){
-          var dst = Object.assign({}, D[cat]);
-          var sdict = src[cat] || {};
-          Object.keys(sdict).forEach(function(k){
-            if(Object.prototype.hasOwnProperty.call(D[cat], k)){
-              dst[k] = sdict[k];
-            }
-          });
-          x[cat] = dst;
-        }else{
-          // Dに存在しないカテゴリは「ユーザー追加カテゴリ」として残す（末尾に追加される）
-          x[cat] = src[cat];
-        }
+    function migrate(o){
+      var raw = clone(o||{});
+
+      // ---- Category name normalization (backward compat) ----
+      var CAT_MAP = {
+        '大人の身だしなみケアプラン': '特別メニュー',
+        '全身ヒゲ': '全身オール'
+      };
+
+      // ---- Plan key normalization ----
+      function normKey(k){
+        return String(k||'')
+          .replace(/保障/g,'保証')
+          .replace(/[　]/g,' ')         // 全角スペース
+          .replace(/\s+/g,' ')
+          .trim();
+      }
+
+      // ---- Merge: D is baseline, user edits (localStorage) override existing keys ----
+      var x = clone(D);
+      Object.keys(raw).forEach(function(cat){
+        var mapped = CAT_MAP[cat] || cat;
+        var srcCat = raw[cat] || {};
+        if(!x[mapped]) x[mapped] = {};
+
+        // normalize + merge (src overrides)
+        Object.keys(srcCat).forEach(function(k){
+          var nk = normKey(k);
+          if(!nk) return;
+          x[mapped][nk] = srcCat[k];
+        });
       });
 
+      // ---- Force-overwrite categories that must stay authoritative ----
+      // 眉小鼻は、古い定義が残っても必ず差し替える
+      if(D['眉小鼻']) x['眉小鼻'] = clone(D['眉小鼻']);
+
+      // ---- Remove deprecated plans that should never reappear from cached data ----
+      // どこでも脱毛：20分2年間系（2つ）を常に除外
+      if(x['どこでも脱毛']){
+        Object.keys(x['どこでも脱毛']).forEach(function(k){
+          var nk = normKey(k);
+          if(/20分.*2年間通い放題/.test(nk)){
+            delete x['どこでも脱毛'][k];
+            delete x['どこでも脱毛'][nk];
+          }
+        });
+      }
+      // 特別メニュー：選べる2点/3点セットを常に除外
+      if(x['特別メニュー']){
+        ['選べる2点セット4回','選べる2点セット8回','選べる3セット4回','選べる3セット8回','選べる3点セット4回','選べる3点セット8回']
+          .map(normKey)
+          .forEach(function(k){
+            delete x['特別メニュー'][k];
+          });
+      }
+
+      
+      // 旧定義の「+1年」系（例：12回+1年 / EP12回+1年…）が残っても必ず除外
       Object.keys(x).forEach(function(cat){
-        var src2 = x[cat] || {};
-        var dst2 = {};
+        var src = x[cat] || {};
+        Object.keys(src).forEach(function(k){
+          var nk = normKey(k);
+          if(nk.indexOf('+1年') >= 0 || nk.indexOf('+1年間') >= 0){
+            delete x[cat][k];
+            delete x[cat][nk];
+          }
+        });
+      });
+
+      // ---- Final pass: normalize keys per category + de-dup while preserving order ----
+      Object.keys(x).forEach(function(cat){
+        var srcCat = x[cat] || {};
+        var dst = {};
         var seen = new Set();
-        Object.keys(src2).forEach(function(k){
-          var nk = (k||'').replace(/保障/g,'保証').replace(/　/g,' ').replace(/\s+/g,' ').trim();
+        Object.keys(srcCat).forEach(function(k){
+          var nk = normKey(k);
+          if(!nk) return;
           if(seen.has(nk)) return;
-          dst2[nk] = src2[k];
+          dst[nk] = srcCat[k];
           seen.add(nk);
         });
-        x[cat] = dst2;
+        x[cat] = dst;
       });
 
       return x;
@@ -552,11 +596,63 @@
 
 
     function get(){
-      try{ var raw=localStorage.getItem('CAMPAIGN_DEF'); if(raw){ var o=JSON.parse(raw); if(o&&typeof o==='object') return migrate(o) } }
-      catch(e){}
-      return clone(D);
+  try{
+    var raw = localStorage.getItem('CAMPAIGN_DEF');
+    if(raw){
+      var o = JSON.parse(raw);
+      if(o && typeof o === 'object'){
+        // ★バージョンが違う場合、古い localStorage を無視して最新定義へリセット
+        if(o.__v !== CAMPAIGN_DEF_VERSION){
+          var base = clone(D);
+          base.__v = CAMPAIGN_DEF_VERSION;
+          localStorage.setItem('CAMPAIGN_DEF', JSON.stringify(base));
+          return clone(D);
+        }
+
+        // メタ情報を除外して扱う
+        var tmp = clone(o);
+        delete tmp.__v;
+
+        // 旧バージョン由来の「+1年系」などを念のため除去（安全策）
+        Object.keys(CAT_MAP).forEach(function(catKey){
+          var cat = CAT_MAP[catKey];
+          if(tmp[cat]){
+            Object.keys(tmp[cat]).forEach(function(plan){
+              if(/12回\s*\+\s*1年/.test(plan) || /\b12回\+1年\b/.test(plan) || /\b12回\+?1年\b/.test(plan)){
+                delete tmp[cat][plan];
+              }
+            });
+          }
+        });
+
+        // クリーンアップした内容を保存し直す（同一バージョン内の編集は維持）
+        try{
+          var save = clone(tmp);
+          save.__v = CAMPAIGN_DEF_VERSION;
+          localStorage.setItem('CAMPAIGN_DEF', JSON.stringify(save));
+        }catch(_e){}
+
+        return migrate(tmp);
+      }
     }
-    function set(o){ try{ localStorage.setItem('CAMPAIGN_DEF',JSON.stringify(o)) }catch(e){} }
+  }catch(e){}
+
+  // 初回（または読み込み失敗）でもバージョンを刻んで保存
+  try{
+    var base2 = clone(D);
+    base2.__v = CAMPAIGN_DEF_VERSION;
+    localStorage.setItem('CAMPAIGN_DEF', JSON.stringify(base2));
+  }catch(_e2){}
+
+  return clone(D);
+}
+function set(o){
+  try{
+    var save = clone(o || {});
+    save.__v = CAMPAIGN_DEF_VERSION;
+    localStorage.setItem('CAMPAIGN_DEF', JSON.stringify(save));
+  }catch(e){}
+}
 
     function ensureMonths(id){
       var el=document.getElementById(id); if(!el) return;
@@ -1388,6 +1484,7 @@ document.addEventListener('DOMContentLoaded',function(){
   (function(){
     'use strict';
     var ORDER = ['matsu','take','ume'];
+    var CAT_ORDER = ["ヒゲ", "フェイス", "どこでも脱毛", "全身", "全身オール", "陰部", "眉小鼻", "特別メニュー", "EPフェイス", "EP上半身+下半身", "EP上半身+下半身+陰部"];
     function el(id){ return document.getElementById(id); }
     function toJPY(n){ return '¥' + Math.max(0, Math.floor(n||0)).toLocaleString(); }
     function labelOf(t){ return t==='matsu'?'プラン①':t==='take'?'プラン②':'プラン③'; }
@@ -1464,10 +1561,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
       list.innerHTML = '';
 
-      var keys = Object.keys(dict);
-      // 表示順は定義(D)の順に合わせる
-      // // 表示順は定義(D)の順に合わせる
-      // keys = sortPlans(keys);
+      var keys = Object.keys(dict); // 表示順は定義(D)の順に合わせる
+
       keys.forEach(function(name){
         var amt = Number(dict[name]) || 0;
 
@@ -1511,7 +1606,20 @@ document.addEventListener('DOMContentLoaded',function(){
       var camp = (window.__getCampaign ? window.__getCampaign() : null) || {};
       if(sel){
         sel.innerHTML = '';
+        // カテゴリ表示順（指定順）
+        var used = {};
+        CAT_ORDER.forEach(function(cat){
+          if(camp[cat]){
+            var opt = document.createElement('option');
+            opt.value = cat;
+            opt.textContent = cat;
+            sel.appendChild(opt);
+            used[cat] = true;
+          }
+        });
+        // 未定義のカテゴリがあれば末尾に追加（保険）
         Object.keys(camp).forEach(function(cat){
+          if(used[cat]) return;
           var opt = document.createElement('option');
           opt.value = cat;
           opt.textContent = cat;
